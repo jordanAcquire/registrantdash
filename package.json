@@ -1,0 +1,24 @@
+{
+  "name": "pre-event-summary",
+  "version": "2.0.0",
+  "description": "Pre-event registrant summary dashboard for financial advisors",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx serve .",
+    "dev": "npx live-server --port=3000"
+  },
+  "keywords": [
+    "dashboard",
+    "financial",
+    "seminar",
+    "leadjig",
+    "acquireup"
+  ],
+  "author": "Jordan Greve <jordan.greve@whiteglove.com>",
+  "license": "UNLICENSED",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/unconqueredlabs/pre-event-summary.git"
+  }
+}
