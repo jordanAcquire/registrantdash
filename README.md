@@ -1,163 +1,121 @@
-# Pre-Event Registrant Summary
+# Pre-Event Registrant Summary Dashboard — V4
 
-A visual dashboard that aggregates LeadJig/Prospectix registrant data to give financial advisors a snapshot of who's in the room before their seminar.
+**An interactive intelligence briefing for financial advisors preparing for client events.**
 
-![Pre-Event Summary Screenshot](assets/screenshot.png)
+Built by AcquireUp · Demo with sample data · Single HTML file, no dependencies
 
-## Overview
+---
 
-Financial advisors currently have to click through LeadJig contacts one-by-one to understand the value of their event. This dashboard solves that by aggregating registrant data into actionable insights:
+## What This Is
 
-- **Total estimated assets** in the room
-- **Opportunity tiers** (Targets, Prospects, Nurture)
-- **Demographic breakdowns** (age, industry, job titles, education)
-- **AI-generated conversation starters** ranked by opportunity value
-- **Drill-down filtering** to find the overlap (e.g., "$1M+ AND 60+")
-- **Advisor-customizable scoring** with adjustable weights
+A self-contained dashboard that transforms a raw event registrant list into an actionable pre-event intelligence report. Advisors open one file and instantly see who's coming, what they're worth, how to prioritize them, and what to say when they walk up to each person.
+
+This is a demo using sample data for a fictional Philadelphia-area retirement planning seminar with 47 registrants (33 matched with consumer data records).
+
+---
+
+## What's New in V4
+
+### Consumer Data Integration
+Every matched registrant is enriched with 30+ consumer data attributes including estimated net worth, household income, home value, home equity, investor classification, consumer profile segment, occupation, charitable donor status, and lifestyle interests.
+
+### Personalized Conversation Starters
+Each individual profile card now generates a custom conversation starter based on that person's unique combination of wealth, age, investor type, family situation, home equity, lifestyle interests, and donor history. No two are alike.
+
+### Dynamic Group Conversation Starters
+The main dashboard features 15 pooled conversation starters that automatically rank and rotate based on the advisor's current scoring weights and active segment filters. Adjust the sliders or click different segments, and the talking points update in real-time.
+
+### Plain English Throughout
+All technical data vendor codes, field names, and classification systems have been replaced with human-readable labels. No "Code F" or "InfoPersona Cluster" — just "Est. Net Worth" and "Consumer Profile."
+
+### Interactive Segment Filtering
+Eight segment cards across wealth, income, home value, investor type, age range, consumer profile, occupation, and lifestyle interests. Click to select segments, combine multiple for cross-filtering, and hit "See Results" to drill into the overlap.
+
+### Adjustable Prospect Scoring
+Four weighted sliders (Net Worth, Income, Investor Type, Home Equity) that dynamically rescore and rerank all 33 prospects in real-time. The opportunity tiers, conversation starters, and all drill-down modals respond to slider changes.
+
+### Individual Profile Cards
+Click any name in any list to open a full profile with six sections:
+- **Conversation Starter** — personalized talking points
+- **About** — age, gender, married, children, homeowner, years in home, location
+- **Wealth & Income** — net worth range, household income, investor type, consumer profile
+- **Property** — home value, home equity, occupation, prospect score
+- **Behavioral Insights** — charitable donor, health causes, political donor, email opt-in
+- **Lifestyle Interests** — tagged interests for rapport-building
+
+---
+
+## Dashboard Sections
+
+| Section | Description |
+|---|---|
+| **Hero Stats** | Registrant count, total estimated wealth, avg age, drive time, top targets |
+| **Data Coverage Banner** | Match rate transparency (33 of 47 matched) |
+| **Prospect Scoring** | Four adjustable weight sliders with live recalculation |
+| **Opportunity Distribution** | Three tiers — Targets, Prospects, Nurture — with click-to-drill |
+| **Conversation Starters** | Dynamic talking points ranked by scoring weights and filters |
+| **Registrant Segments** | Eight filterable segment cards with cross-filter support |
+| **Quick Stats** | Age, Married, Children, Homeowners, Donors, Active Investors, Net Worth $1M+, Match Rate |
+
+---
 
 ## Features
 
-### V1 (Current)
-- Aggregate stats (registrants, households, est. assets, match score, drive time)
-- Asset tier distribution
-- Age distribution
-- Industry & job title breakdowns
-- Top 5 prospects to target
-- Conversation starters
-- Geographic breakdown (top zip codes)
-- Education level summary
+- **Single HTML file** — no build step, no server, no dependencies
+- **Dark/Light mode** — theme toggle in header
+- **Fully interactive** — every stat, card, and name is clickable
+- **Real-time scoring** — sliders dynamically rerank all prospects
+- **Cross-segment filtering** — combine any segments, hit See Results
+- **Personal conversation starters** — AI-style briefing per individual
+- **Dynamic group starters** — 15 pooled starters that respond to context
+- **Location data** — city/state for every matched registrant
+- **Mobile responsive** — works on tablet for on-site use
+- **Print-ready export** — browser print dialog via Export button
 
-### V2 (Concept)
-- Sample size transparency banner
-- Advisor-driven scoring sliders (Net Worth, Age, Title, Match Score)
-- 3-tier opportunity distribution (Targets → Prospects → Nurture)
-- Clickable tiles with drill-down modal
-- Cross-filtering (Venn diagram overlaps)
-- Enhanced data fields (Married, Children, Retired status, Uses Advisor)
-- Ranked conversation starters tied to opportunity value
+---
 
-## Tech Stack
+## How to Use
 
-- **HTML5** / **CSS3** (no frameworks, pure vanilla)
-- **JavaScript** (vanilla, no dependencies)
-- **Google Fonts** (DM Sans, Fraunces)
+1. Open `index.html` in any modern browser
+2. Review hero stats for room-level overview
+3. Adjust scoring sliders to match your priorities
+4. Watch conversation starters and opportunity tiers update
+5. Click segment cards to filter by criteria
+6. Combine segments and hit "See Results" for overlaps
+7. Click any name to open their full profile and personal conversation starter
+8. Review your top targets before the event
 
-## File Structure
+---
 
-```
-pre-event-summary/
-├── README.md
-├── index.html          # V1 - Production ready mockup
-├── v2.html             # V2 - Full concept with all features
-├── src/
-│   ├── styles.css      # Shared styles
-│   └── app.js          # Interactive functionality
-└── assets/
-    └── screenshot.png  # Preview image
-```
+## Data Sources (Production)
 
-## Getting Started
+In production, this dashboard would be powered by:
+- **Registration form data** — name, title, company, email, address
+- **DataAxel consumer data append** — 490+ available fields including wealth, income, home data, lifestyle interests, donor history, and consumer profile segments
+- **AcquireUp event platform** — registrant management and advisor matching
 
-1. Clone the repo:
-   ```bash
-   git clone https://github.com/yourusername/pre-event-summary.git
-   ```
+This demo uses realistic sample data to demonstrate the dashboard's capabilities.
 
-2. Open `index.html` in your browser (no build step required)
+---
 
-3. For V2 concept, open `v2.html`
+## Version History
 
-## Data Integration (Future)
+| Version | Description |
+|---|---|
+| V1 | Static summary with basic registrant stats |
+| V2 | Added interactive modals and drill-down tables |
+| V3 | Enhanced with opportunity tiers, scoring sliders, segment cards |
+| V4 | Consumer data integration, personalized conversation starters, dynamic starters, plain English rewrite, location data, cross-segment filtering |
 
-This is currently a static mockup. To make it functional, you'll need to:
+---
 
-1. **LeadJig API** - Pull registrant data for a campaign
-2. **Prospectix API** - Enrich with wealth/demographic data
-3. **DataAxel** (optional) - Additional fields like propensity scores
+## Tech
 
-### Expected Data Schema
+- Pure HTML/CSS/JavaScript
+- Zero external dependencies
+- ~470 lines, single file
+- Works offline once loaded
 
-```javascript
-{
-  registrant: {
-    id: string,
-    name: string,
-    email: string,
-    phone: string,
-    age: number,
-    worth: string,           // "$1M+", "$500K-$1M", etc.
-    industry: string,
-    jobTitle: string,
-    company: string,
-    education: string,
-    address: {
-      street: string,
-      city: string,
-      state: string,
-      zip: string
-    },
-    matchScore: number,      // 1-10
-    married: boolean,
-    hasChildren: boolean,
-    hasGrandchildren: boolean,
-    isRetired: boolean,
-    usesAdvisor: boolean,
-    emailOptIn: boolean,
-    smsOptIn: boolean
-  },
-  event: {
-    id: string,
-    name: string,
-    date: string,
-    time: string,
-    venue: string,
-    address: string,
-    campaign: string
-  }
-}
-```
+---
 
-## Customization
-
-### Brand Colors
-
-Update CSS variables in `src/styles.css`:
-
-```css
-:root {
-    --bg-primary: #0a1628;
-    --bg-card: #0f2039;
-    --accent-neon: #00e5cc;
-    --accent-gold: #c9a227;
-    --text-primary: #f5f0e6;
-}
-```
-
-### Scoring Weights
-
-Default scoring formula (adjustable by advisor):
-
-| Factor | Default Weight |
-|--------|----------------|
-| Net Worth | 40% |
-| Age (Retirement Ready) | 30% |
-| Professional Title | 20% |
-| Match Score | 10% |
-
-## Roadmap
-
-- [ ] Connect to LeadJig API
-- [ ] Connect to Prospectix API
-- [ ] Real-time data population
-- [ ] PDF export
-- [ ] Post-event version (attendance tracking)
-- [ ] Mobile responsive design
-- [ ] Integration with CRM follow-up workflows
-
-## License
-
-Proprietary - AcquireUp Internal Use
-
-## Credits
-
-Built by Jordan Greve @ AcquireUp / Unconquered Labs
+*Built for AcquireUp — helping financial advisors turn event registrants into clients.*
