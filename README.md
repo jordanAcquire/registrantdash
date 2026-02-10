@@ -1,121 +1,134 @@
-# Pre-Event Registrant Summary Dashboard — V4
+# Pre-Event Registrant Dashboard v5
 
-**An interactive intelligence briefing for financial advisors preparing for client events.**
+Interactive intelligence briefing for financial advisors preparing for educational seminars. Combines registration data with consumer insights to help advisors understand who's in the room before they walk in.
 
-Built by AcquireUp · Demo with sample data · Single HTML file, no dependencies
-
----
-
-## What This Is
-
-A self-contained dashboard that transforms a raw event registrant list into an actionable pre-event intelligence report. Advisors open one file and instantly see who's coming, what they're worth, how to prioritize them, and what to say when they walk up to each person.
-
-This is a demo using sample data for a fictional Philadelphia-area retirement planning seminar with 47 registrants (33 matched with consumer data records).
+![Dashboard Preview](https://img.shields.io/badge/status-internal_demo-blue) ![Version](https://img.shields.io/badge/version-5.0-green)
 
 ---
 
-## What's New in V4
+## What It Does
 
-### Consumer Data Integration
-Every matched registrant is enriched with 30+ consumer data attributes including estimated net worth, household income, home value, home equity, investor classification, consumer profile segment, occupation, charitable donor status, and lifestyle interests.
+Advisors run dinner seminars to meet prospective clients. This dashboard takes the registration list, matches it against consumer data records, and surfaces actionable insights — who to talk to first, what to say, and how the room breaks down demographically.
 
-### Personalized Conversation Starters
-Each individual profile card now generates a custom conversation starter based on that person's unique combination of wealth, age, investor type, family situation, home equity, lifestyle interests, and donor history. No two are alike.
+**Two modes serve two products:**
 
-### Dynamic Group Conversation Starters
-The main dashboard features 15 pooled conversation starters that automatically rank and rotate based on the advisor's current scoring weights and active segment filters. Adjust the sliders or click different segments, and the talking points update in real-time.
-
-### Plain English Throughout
-All technical data vendor codes, field names, and classification systems have been replaced with human-readable labels. No "Code F" or "InfoPersona Cluster" — just "Est. Net Worth" and "Consumer Profile."
-
-### Interactive Segment Filtering
-Eight segment cards across wealth, income, home value, investor type, age range, consumer profile, occupation, and lifestyle interests. Click to select segments, combine multiple for cross-filtering, and hit "See Results" to drill into the overlap.
-
-### Adjustable Prospect Scoring
-Four weighted sliders (Net Worth, Income, Investor Type, Home Equity) that dynamically rescore and rerank all 33 prospects in real-time. The opportunity tiers, conversation starters, and all drill-down modals respond to slider changes.
-
-### Individual Profile Cards
-Click any name in any list to open a full profile with six sections:
-- **Conversation Starter** — personalized talking points
-- **About** — age, gender, married, children, homeowner, years in home, location
-- **Wealth & Income** — net worth range, household income, investor type, consumer profile
-- **Property** — home value, home equity, occupation, prospect score
-- **Behavioral Insights** — charitable donor, health causes, political donor, email opt-in
-- **Lifestyle Interests** — tagged interests for rapport-building
-
----
-
-## Dashboard Sections
-
-| Section | Description |
-|---|---|
-| **Hero Stats** | Registrant count, total estimated wealth, avg age, drive time, top targets |
-| **Data Coverage Banner** | Match rate transparency (33 of 47 matched) |
-| **Prospect Scoring** | Four adjustable weight sliders with live recalculation |
-| **Opportunity Distribution** | Three tiers — Targets, Prospects, Nurture — with click-to-drill |
-| **Conversation Starters** | Dynamic talking points ranked by scoring weights and filters |
-| **Registrant Segments** | Eight filterable segment cards with cross-filter support |
-| **Quick Stats** | Age, Married, Children, Homeowners, Donors, Active Investors, Net Worth $1M+, Match Rate |
-
----
+- **Express** — Full drill-down access. Click any number, segment, or person to explore. Designed for advisors who've purchased the complete pre-event package.
+- **Performance** — Aggregate-only view. See room composition and conversation starters without individual records. Designed to demonstrate value and drive upgrades.
 
 ## Features
 
-- **Single HTML file** — no build step, no server, no dependencies
-- **Dark/Light mode** — theme toggle in header
-- **Fully interactive** — every stat, card, and name is clickable
-- **Real-time scoring** — sliders dynamically rerank all prospects
-- **Cross-segment filtering** — combine any segments, hit See Results
-- **Personal conversation starters** — AI-style briefing per individual
-- **Dynamic group starters** — 15 pooled starters that respond to context
-- **Location data** — city/state for every matched registrant
-- **Mobile responsive** — works on tablet for on-site use
-- **Print-ready export** — browser print dialog via Export button
+### Hero Stats
+Five at-a-glance cards: total registrants, estimated wealth in room, average match score, average drive time, and top targets. Subtitles adapt per mode — Express shows match/unmatch breakdown, Performance shows neutral context.
 
----
+### Quick Stats Bar
+Demographic snapshot positioned right below the hero: average age, % married, % with children, % homeowners, donor count, active investor count, and high-net-worth count. Gives advisors presentation calibration at a glance.
 
-## How to Use
+### Conversation Starters
+Six AI-ranked talking points combining demographic, financial, and behavioral signals. Each starter lists the people in the group (up to 3 names + overflow) and includes a tactical advisor tip. Clicking a starter in Express mode opens a results table with the tip pinned at the top as a gold banner.
 
-1. Open `index.html` in any modern browser
-2. Review hero stats for room-level overview
-3. Adjust scoring sliders to match your priorities
-4. Watch conversation starters and opportunity tiers update
-5. Click segment cards to filter by criteria
-6. Combine segments and hit "See Results" for overlaps
-7. Click any name to open their full profile and personal conversation starter
-8. Review your top targets before the event
+### Registrant Segments
+Eight filterable segment cards across four categories:
 
----
+| Financial | Demographic | Behavioral | Lifestyle |
+|-----------|-------------|------------|-----------|
+| Est. Net Worth | Age Range | Investor Type | Consumer Profile |
+| Household Income | Occupation | Lifestyle Interests | — |
+| Home Value | — | — | — |
 
-## Data Sources (Production)
+**Cross-filtering:** Click multiple segments to combine filters. Incompatible segments dim automatically. Hit "See Results" to view the overlap in a sortable table.
 
-In production, this dashboard would be powered by:
-- **Registration form data** — name, title, company, email, address
-- **DataAxel consumer data append** — 490+ available fields including wealth, income, home data, lifestyle interests, donor history, and consumer profile segments
-- **AcquireUp event platform** — registrant management and advisor matching
+### Person Cards (Express only)
+Full profile modal for each matched registrant:
+- Conversation starter narrative
+- About section (age, marital status, children, homeowner)
+- Wealth & income tiers
+- Property details with home value range
+- Behavioral signals (investor type, donor status)
+- Lifestyle interests with persona description
+- Contact info (phone, email, full street address)
+- **Similar Profiles** navigation — browse other registrants in the same persona segment without closing the modal
+- **Print Card** button — opens a clean, print-friendly popup for physical prep
 
-This demo uses realistic sample data to demonstrate the dashboard's capabilities.
+### Sortable Tables
+All result tables support column sorting. Click any header (Name, Age, Title, Net Worth, Income, Investor Type, Score) to sort ascending/descending. Sorts by underlying tier values for financial columns.
 
----
+### Unmatched Registrants
+The "All Registrants" modal shows all 33 matched records followed by 14 unmatched registrants as greyed-out rows with "No data available." Advisors can at least see who else is coming.
+
+### Dark/Light Mode
+Full theme toggle. Dark mode is default for on-screen review; light mode available for printing.
+
+## Architecture
+
+Single self-contained HTML file. No build step, no dependencies, no server required. Open in any browser.
+
+```
+index.html
+├── <style>        — All CSS including theme variables, responsive grid, modals
+├── <body>         — Static layout shell + segment cards
+└── <script>       — Prospect data array, filtering engine, modal system, rendering
+```
+
+### Data Structure
+
+Each matched prospect record contains:
+
+```javascript
+{
+  id, name, age, title, company, city,
+  wealthTier (1-4), wealth (display string),
+  incomeTier (1-4), income (display string),
+  homeValue (range string, e.g. "$500K – $600K"),
+  investorTier (1-4), investorType (display string),
+  married, children, homeowner, donor,
+  interests: { finance, golf, travel, wine },
+  persona, occupation,
+  phone, email, address,
+  matchScore
+}
+```
+
+### Key Functions
+
+| Function | Purpose |
+|----------|---------|
+| `setMode(mode)` | Toggle Express/Performance, swap subtitles via data attributes |
+| `renderStarters()` | Score and rank conversation starters, deduplicate lead names |
+| `renderQuickStats()` | Compute demographic stats from prospect data |
+| `segClick(label, type)` | Add/remove segment filters, trigger dimming |
+| `updateSegmentDimming()` | Grey out segments with zero cross-filter overlap |
+| `getFilteredProspects()` | Apply all active filters, return matching records |
+| `matchesFilter(p, f)` | Test a single prospect against a single filter |
+| `openPersonModal(id)` | Build and display full prospect profile card |
+| `renderSimilarProfiles(p)` | List same-persona registrants for in-modal navigation |
+| `generateTable(data, tip, unmatched)` | Render sortable table with optional tip banner and unmatched rows |
+| `sortTable(col)` | Re-sort current table by column, toggle asc/desc |
+| `printPersonCard()` | Open print-friendly popup with CSS variable replacement |
+| `calculateScore(p)` | Composite score from wealth, income, investor, and interest signals |
+
+## Demo Mode
+
+The dashboard ships with a demo banner and synthetic data for a fictional event:
+
+- **Event:** Social Security & Retirement Planning
+- **Date:** January 28th, 2026
+- **Venue:** Panache Woodfire Grill, Philadelphia PA
+- **Advisor:** Preservation Wealth Management
+- **Data:** 33 matched + 14 unmatched registrants
+
+Toggle between Express and Performance in the top-right corner to see both product experiences.
 
 ## Version History
 
-| Version | Description |
-|---|---|
-| V1 | Static summary with basic registrant stats |
-| V2 | Added interactive modals and drill-down tables |
-| V3 | Enhanced with opportunity tiers, scoring sliders, segment cards |
-| V4 | Consumer data integration, personalized conversation starters, dynamic starters, plain English rewrite, location data, cross-segment filtering |
+| Version | Changes |
+|---------|---------|
+| **v5.0** | Conversation starters promoted above segments, Performance/Express dual-mode, segment cross-filtering with dimming, similar profiles navigation, sortable tables, print cards, quick stats bar, unmatched registrants, mode-aware subtitles |
+| **v4.0** | Initial interactive dashboard with segments, person modals, conversation starters, scoring system |
+
+## Internal Use Only
+
+This dashboard contains synthetic demo data and is intended for internal review and customer advisory board presentations. Not for distribution.
 
 ---
 
-## Tech
-
-- Pure HTML/CSS/JavaScript
-- Zero external dependencies
-- ~470 lines, single file
-- Works offline once loaded
-
----
-
-*Built for AcquireUp — helping financial advisors turn event registrants into clients.*
+*Built by AI & Automation · AcquireUp*
