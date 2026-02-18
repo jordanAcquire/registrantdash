@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark" data-mode="express">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pre-Event Registrant Summary | Global Wealth Management</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:wght@600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg-primary: #0a1628; --bg-card: #0f2039; --bg-card-alt: #162a4a; --bg-modal: #0d1a2d;
+            --accent-neon: #00e5cc; --accent-neon-dim: rgba(0, 229, 204, 0.15);
+            --accent-gold: #c9a227; --accent-gold-dim: rgba(201, 162, 39, 0.15);
+            --accent-blue: #3b82f6; --accent-purple: #a855f7; --accent-red: #ef4444;
+            --text-primary: #f5f0e6; --text-secondary: #a8b5c4; --text-muted: #6b7a8a;
+            --border: rgba(0, 229, 204, 0.12); --tier1: #00e5cc; --tier2: #c9a227; --tier3: #3b82f6;
+        }
+        [data-theme="light"] {
+            --bg-primary: #f8fafc; --bg-card: #ffffff; --bg-card-alt: #f1f5f9; --bg-modal: #ffffff;
+            --accent-neon: #0d9488; --accent-neon-dim: rgba(13, 148, 136, 0.15);
+            --text-primary: #1e293b; --text-secondary: #475569; --text-muted: #94a3b8;
+            --border: rgba(13, 148, 136, 0.2); --tier1: #0d9488; --tier2: #b45309; --tier3: #2563eb;
+        }
+        body { font-family: 'DM Sans', sans-serif; background: var(--bg-primary); color: var(--text-primary); min-height: 100vh; padding: 40px; padding-top: 80px; transition: background 0.3s, color 0.3s; }
+        [data-theme="dark"] body { background-image: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(0,229,204,0.1), transparent), radial-gradient(ellipse 60% 40% at 100% 100%, rgba(201,162,39,0.05), transparent); }
+        .container { max-width: 1400px; margin: 0 auto; }
+        .demo-banner { position: fixed; top: 0; left: 0; right: 0; background: linear-gradient(90deg, var(--accent-neon), var(--accent-gold)); color: #0a1628; padding: 10px 20px; display: flex; justify-content: center; align-items: center; gap: 16px; font-size: 13px; font-weight: 600; z-index: 1001; }
+        .demo-badge { background: rgba(0,0,0,0.2); padding: 3px 10px; border-radius: 20px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; }
+        .demo-controls { display: flex; align-items: center; gap: 12px; margin-left: auto; }
+        .demo-btn { display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.2); padding: 4px 12px; border-radius: 20px; cursor: pointer; font-size: 12px; border: none; color: inherit; font-family: inherit; font-weight: 600; }
+        .demo-btn:hover { background: rgba(0,0,0,0.35); }
+        .mode-toggle { display: inline-flex; align-items: center; border-radius: 20px; overflow: hidden; border: 1px solid rgba(0,0,0,0.15); }
+        .mode-option { padding: 5px 14px; font-size: 10px; font-weight: 700; cursor: pointer; transition: all 0.25s; border: none; background: rgba(0,0,0,0.08); color: rgba(10,22,40,0.4); font-family: inherit; text-transform: uppercase; letter-spacing: 0.05em; }
+        .mode-option.active { background: rgba(255,255,255,0.95); color: #0a1628; box-shadow: 0 1px 3px rgba(0,0,0,0.15); }
+        .mode-option:hover:not(.active) { color: rgba(10,22,40,0.7); }
+        .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; }
+        .badge { display: inline-block; background: var(--accent-neon-dim); color: var(--accent-neon); padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
+        .event-title { font-family: 'Fraunces', serif; font-size: 28px; font-weight: 700; margin-bottom: 8px; }
+        .event-date-tabs { display: flex; gap: 8px; margin-bottom: 10px; }
+        .event-date-tab { display: flex; flex-direction: column; gap: 2px; padding: 8px 16px; border-radius: 8px; border: 1px solid var(--border); background: transparent; color: var(--text-secondary); cursor: pointer; font-family: inherit; transition: all 0.25s; text-align: left; }
+        .event-date-tab .edt-day { font-size: 13px; font-weight: 600; }
+        .event-date-tab .edt-time { font-size: 10px; color: var(--text-muted); }
+        .event-date-tab.active { border-color: var(--accent-neon); background: var(--accent-neon-dim); color: var(--accent-neon); }
+        .event-date-tab.active .edt-time { color: var(--accent-neon); opacity: 0.7; }
+        .event-date-tab:hover:not(.active) { border-color: var(--text-muted); }
+        .event-meta { display: flex; gap: 16px; font-size: 12px; color: var(--text-secondary); flex-wrap: wrap; }
+        .header-right { text-align: right; }
+        .logo { font-family: 'Fraunces', serif; font-size: 14px; font-weight: 700; letter-spacing: 0.15em; color: var(--text-muted); margin-bottom: 4px; }
+        .live-indicator { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--accent-neon); }
+        .live-dot { width: 6px; height: 6px; background: var(--accent-neon); border-radius: 50%; animation: pulse 2s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+        @keyframes fadeSlide { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+        .hero-stats { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 16px; }
+        .hero-stat { background: var(--bg-card); border-radius: 12px; padding: 16px; border: 1px solid var(--border); cursor: pointer; position: relative; overflow: hidden; transition: all 0.3s; }
+        .hero-stat:hover { border-color: var(--accent-neon); transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,229,204,0.1); }
+        .hero-stat.featured { border-color: var(--accent-neon); background: linear-gradient(135deg, var(--bg-card) 0%, rgba(0,229,204,0.08) 100%); }
+        .stat-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 4px; }
+        .stat-value { font-family: 'Fraunces', serif; font-size: 28px; font-weight: 700; }
+        .stat-value.money { color: var(--accent-neon); }
+        .stat-sub { font-size: 11px; color: var(--text-secondary); margin-top: 2px; }
+        .stat-hover-hint { position: absolute; bottom: 6px; right: 12px; font-size: 9px; color: var(--accent-neon); opacity: 0; transition: opacity 0.2s; }
+        .hero-stat:hover .stat-hover-hint { opacity: 1; }
+        .starters-card { background: var(--bg-card); border-radius: 12px; padding: 16px; border: 1px solid var(--border); margin-bottom: 16px; }
+        .starters-header { margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+        .starters-title { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+        .starters-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+        .starter-item { display: flex; align-items: flex-start; gap: 10px; padding: 10px; border-radius: 8px; background: var(--bg-card-alt); cursor: pointer; transition: all 0.2s; }
+        .starter-item:hover { transform: translateY(-1px); }
+        .starter-rank { width: 22px; height: 22px; background: var(--accent-neon-dim); color: var(--accent-neon); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 10px; flex-shrink: 0; }
+        .starter-item.high-value .starter-rank { background: var(--accent-gold-dim); color: var(--accent-gold); }
+        .starter-text { font-size: 12px; color: var(--text-secondary); line-height: 1.4; }
+        .starter-text strong { color: var(--text-primary); }
+        .filters-bar { background: var(--bg-card); border-radius: 10px; padding: 10px 16px; display: flex; align-items: center; gap: 12px; margin-bottom: 12px; border: 1px solid var(--border); flex-wrap: wrap; }
+        .filters-label { font-size: 11px; color: var(--text-muted); white-space: nowrap; }
+        .active-filters { display: flex; gap: 6px; flex-wrap: wrap; flex: 1; }
+        .filter-tag { background: var(--accent-neon-dim); color: var(--accent-neon); padding: 3px 10px; border-radius: 16px; font-size: 11px; cursor: pointer; display: flex; align-items: center; gap: 4px; }
+        .filter-tag .remove { font-weight: 700; }
+        .filter-tag:hover { background: var(--accent-neon); color: #0a1628; }
+        .filter-results { font-size: 11px; color: var(--accent-neon); }
+        .clear-filters { font-size: 11px; color: var(--accent-red); cursor: pointer; white-space: nowrap; }
+        .see-results { font-size: 11px; color: var(--accent-neon); cursor: pointer; white-space: nowrap; font-weight: 600; padding: 3px 10px; background: var(--accent-neon-dim); border-radius: 16px; transition: all 0.2s; }
+        .see-results:hover { background: var(--accent-neon); color: #0a1628; }
+        .segments-section { margin-bottom: 16px; }
+        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .section-title { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+        .section-hint { font-size: 10px; color: var(--text-muted); }
+        .segments-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+        .segment-card { background: var(--bg-card); border-radius: 12px; padding: 14px; border: 1px solid var(--border); }
+        .segment-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .segment-title { font-size: 12px; font-weight: 600; } .segment-icon { font-size: 16px; }
+        .segment-items { display: flex; flex-direction: column; gap: 4px; }
+        .segment-item { display: flex; justify-content: space-between; align-items: center; padding: 6px 10px; border-radius: 6px; cursor: pointer; transition: all 0.2s; font-size: 12px; }
+        .segment-item:hover { background: var(--accent-neon-dim); }
+        .segment-item.active { background: var(--accent-neon); color: #0a1628; }
+        .segment-item-label { color: var(--text-secondary); } .segment-item.active .segment-item-label { color: #0a1628; }
+        .segment-item-count { font-weight: 700; font-size: 13px; }
+        .segment-item.dimmed { opacity: 0.3; pointer-events: none; }
+        .segment-item.dimmed .segment-item-count { opacity: 0.5; }
+        .quick-stats { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; margin-bottom: 20px; }
+        .quick-stat { background: var(--bg-card); border-radius: 10px; padding: 12px 8px; text-align: center; border: 1px solid var(--border); cursor: pointer; transition: all 0.2s; }
+        .quick-stat:hover { border-color: var(--accent-neon); transform: translateY(-2px); }
+        .quick-stat-icon { font-size: 16px; margin-bottom: 4px; }
+        .quick-stat-value { font-family: 'Fraunces', serif; font-size: 16px; font-weight: 700; margin-bottom: 2px; }
+        .quick-stat-label { font-size: 8px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+        .footer { display: flex; justify-content: space-between; align-items: center; padding-top: 16px; border-top: 1px solid var(--border); color: var(--text-muted); font-size: 11px; }
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
+        .modal-overlay.active { display: flex; }
+        .modal { background: var(--bg-modal); border-radius: 16px; width: 100%; max-width: 900px; max-height: 85vh; overflow: hidden; border: 1px solid var(--border); box-shadow: 0 24px 64px rgba(0,0,0,0.5); animation: modalIn 0.3s ease; }
+        @keyframes modalIn { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-bottom: 1px solid var(--border); background: var(--bg-card); }
+        .modal-title-area { display: flex; align-items: center; gap: 12px; }
+        .modal-icon { width: 40px; height: 40px; background: var(--accent-neon-dim); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+        .modal-title { font-family: 'Fraunces', serif; font-size: 18px; font-weight: 700; }
+        .modal-subtitle { font-size: 11px; color: var(--text-muted); }
+        .modal-close { width: 32px; height: 32px; background: var(--bg-card-alt); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: none; color: var(--text-secondary); font-size: 18px; transition: all 0.2s; }
+        .modal-close:hover { background: var(--accent-red); color: white; transform: rotate(90deg); }
+        .modal-body { padding: 20px; max-height: 60vh; overflow-y: auto; }
+        .modal-table { width: 100%; border-collapse: collapse; }
+        .modal-table th { text-align: left; padding: 10px 12px; font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); border-bottom: 1px solid var(--border); background: var(--bg-card); position: sticky; top: 0; }
+        .modal-table td { padding: 10px 12px; font-size: 12px; border-bottom: 1px solid var(--border); }
+        .modal-table tr { cursor: pointer; transition: background 0.2s; }
+        .modal-table tr:hover { background: var(--accent-neon-dim); }
+        .table-name { font-weight: 600; }
+        .table-badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: 600; background: var(--accent-neon-dim); color: var(--accent-neon); }
+        .table-badge.gold { background: var(--accent-gold-dim); color: var(--accent-gold); }
+        .table-badge.blue { background: rgba(59,130,246,0.15); color: var(--accent-blue); }
+        .table-badge.purple { background: rgba(168,85,247,0.15); color: var(--accent-purple); }
+        .person-detail { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .person-section { background: var(--bg-card-alt); border-radius: 10px; padding: 16px; }
+        .person-section.full-width { grid-column: 1 / -1; }
+        .person-section-title { font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 12px; font-weight: 600; }
+        .person-field { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid var(--border); }
+        .person-field:last-child { border-bottom: none; }
+        .person-field-label { font-size: 12px; color: var(--text-muted); }
+        .person-field-value { font-size: 12px; font-weight: 600; text-align: right; max-width: 60%; }
+        .lifestyle-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+        .lifestyle-tag { background: var(--accent-neon-dim); color: var(--accent-neon); padding: 3px 10px; border-radius: 12px; font-size: 10px; font-weight: 500; }
+        .lifestyle-tag.investor { background: var(--accent-gold-dim); color: var(--accent-gold); }
+        .venn-preview { background: var(--bg-card-alt); border-radius: 10px; padding: 16px; margin-bottom: 16px; text-align: center; }
+        .venn-title { font-size: 12px; color: var(--text-muted); margin-bottom: 8px; }
+        .venn-result { font-family: 'Fraunces', serif; font-size: 32px; font-weight: 700; color: var(--accent-neon); }
+        .venn-desc { font-size: 11px; color: var(--text-secondary); margin-top: 4px; }
+        [data-mode="performance"] .hero-stat .stat-hover-hint { display: none; }
+        [data-mode="performance"] .hero-stat { cursor: default; }
+        [data-mode="performance"] .hero-stat:hover { transform: none; box-shadow: none; border-color: var(--border); }
+        [data-mode="performance"] .hero-stat.featured:hover { border-color: var(--accent-neon); }
+        [data-mode="performance"] .segment-item { cursor: default; }
+        [data-mode="performance"] .segment-item:hover { background: transparent; }
+        [data-mode="performance"] .segment-item.active { background: transparent; color: inherit; }
+        [data-mode="performance"] .segment-item.active .segment-item-label { color: var(--text-secondary); }
+        [data-mode="performance"] .filters-bar { display: none; }
+        [data-mode="performance"] .quick-stat { cursor: default; }
+        [data-mode="performance"] .quick-stat:hover { transform: none; border-color: var(--border); }
+        [data-mode="performance"] .starter-item { cursor: default; }
+        [data-mode="performance"] .starter-item:hover { transform: none; }
+        [data-mode="performance"] .hero-stat.top-targets-card { display: none; }
+        [data-mode="performance"] .hero-stats { grid-template-columns: repeat(4, 1fr); }
+        [data-mode="performance"] .section-hint { display: none; }
+        [data-mode="performance"] .data-coverage-banner { display: none; }
+
+        @media print {
+            .demo-banner, .modal-overlay { display: none !important; }
+            body { padding-top: 20px; background: white !important; color: #1a1a1a !important; }
+            .print-person-card { display: block !important; }
+        }
+        .print-person-card { display: none; }
+        .print-person-btn { background: var(--bg-card-alt); border: 1px solid var(--border); color: var(--text-secondary); padding: 4px 12px; border-radius: 16px; font-size: 11px; cursor: pointer; font-family: inherit; font-weight: 600; display: flex; align-items: center; gap: 4px; transition: all 0.2s; }
+        .print-person-btn:hover { border-color: var(--accent-neon); color: var(--accent-neon); }
+        @media (max-width: 1200px) { .hero-stats { grid-template-columns: repeat(3, 1fr); } .segments-grid { grid-template-columns: repeat(2, 1fr); } .quick-stats { grid-template-columns: repeat(4, 1fr); } .starters-grid { grid-template-columns: 1fr; } }
+        @media (max-width: 768px) { body { padding: 16px; padding-top: 90px; } .hero-stats { grid-template-columns: repeat(2, 1fr); } .segments-grid { grid-template-columns: 1fr; } .quick-stats { grid-template-columns: repeat(2, 1fr); } .person-detail { grid-template-columns: 1fr; } .demo-banner { flex-wrap: wrap; } }
+    </style>
+</head>
+<body>
+    <div class="demo-banner">
+        <span class="demo-badge">Demo Mode</span>
+        <span id="banner-text">Pre-Event Registrant Summary — Click anything to explore!</span>
+        <div class="demo-controls">
+            <div class="mode-toggle">
+                <button class="mode-option active" id="mode-express" onclick="setMode('express')">Express</button>
+                <button class="mode-option" id="mode-perf" onclick="setMode('performance')">Performance</button>
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <header class="header">
+            <div class="header-left">
+                <div class="badge">Pre-Event Summary</div>
+                <h1 class="event-title">Estate Planning Workshop</h1>
+                <div class="event-date-tabs">
+                    <button class="event-date-tab active" id="tab-morning" onclick="setEventDate('morning')">
+                        <span class="edt-day">Wed, Feb 18</span>
+                        <span class="edt-time">11:00 AM – 12:00 PM</span>
+                    </button>
+                    <button class="event-date-tab" id="tab-evening" onclick="setEventDate('evening')">
+                        <span class="edt-day">Mon, Feb 23</span>
+                        <span class="edt-time">6:00 PM – 7:00 PM</span>
+                    </button>
+                </div>
+                <div class="event-meta">
+                    <span>📍 The Pride Center at Equality Park, Wilton Manors FL</span>
+                    <span>🏢 Global Wealth Management Investment Advisory, Inc</span>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="logo">ACQUIREUP</div>
+                <div class="live-indicator"><span class="live-dot"></span><span>Updated just now</span></div>
+            </div>
+        </header>
+        <div class="hero-stats">
+            <div class="hero-stat" onclick="heroClick('all')" title="33 matched + 14 unmatched"><div class="stat-label">Total Registrants</div><div class="stat-value" data-count="38">0</div><div class="stat-sub" data-express="28 matched · 25 households · 10 unmatched" data-performance="25 households">28 matched · 25 households · 10 unmatched</div><div class="stat-hover-hint">Click to view all →</div></div>
+            <div class="hero-stat featured" onclick="heroClick('assets')"><div class="stat-label">Est. Wealth in Room</div><div class="stat-value money" data-count="16250000" data-prefix="$" data-format="currency">$0</div><div class="stat-sub" data-express="Based on 28 of 38 registrants (25 households)" data-performance="Estimated from registrant data">Based on 28 of 38 registrants (25 households)</div><div class="stat-hover-hint">Click for breakdown →</div></div>
+            <div class="hero-stat" onclick="heroClick('scores')"><div class="stat-label">Avg Match Score</div><div class="stat-value"><span data-count="8.4" data-decimals="1">0</span><span style="font-size:14px;font-weight:400;color:var(--text-muted)"> / 10</span></div><div class="stat-sub" data-express="28 matched · 25 households" data-performance="Composite quality indicator">28 matched · 25 households</div><div class="stat-hover-hint">Click for details →</div></div>
+            <div class="hero-stat" onclick="heroClick('drive')"><div class="stat-label">Avg Drive Time</div><div class="stat-value"><span data-count="14">0</span><span style="font-size:14px;font-weight:400"> min</span></div><div class="stat-sub">Within 12 mi radius</div><div class="stat-hover-hint">Click for map data →</div></div>
+            <div class="hero-stat top-targets-card" onclick="heroClick('tier1')"><div class="stat-label">Top Targets</div><div class="stat-value" style="color:var(--accent-gold)" data-count="13">0</div><div class="stat-sub">★ Priority prospects</div><div class="stat-hover-hint">Click to see who →</div></div>
+        </div>
+        <div class="quick-stats" id="quick-stats"></div>
+        <div class="starters-card">
+            <div class="starters-header"><span class="starters-title">💬 Conversation Starters</span><span class="section-hint" style="font-size:10px;color:var(--text-muted);margin-left:8px">Ranked by prospect data & filters</span></div>
+            <div class="starters-grid" id="starters-grid"></div>
+        </div>
+        <div class="segments-section">
+            <div class="section-header"><span class="section-title">📋 Registrant Segments</span><span class="section-hint">Click to select • Combine segments • Hit "See Results" to view</span></div>
+            <div class="filters-bar" style="margin-bottom:12px">
+                <span class="filters-label">🔍 Active Filters:</span>
+                <div class="active-filters" id="active-filters"></div>
+                <div class="filter-results" id="filter-results"></div>
+                <span class="clear-filters" id="clear-btn" style="display:none" onclick="clearFilters()">Clear All</span>
+                <span class="see-results" id="results-btn" style="display:none" onclick="openFilteredModal()">See Results →</span>
+            </div>
+            <div class="segments-grid">
+                <div class="segment-card"><div class="segment-header"><span class="segment-title">Est. Net Worth</span><span class="segment-icon">💎</span></div><div class="segment-items"><div class="segment-item" onclick="segClick('$1M+','wealth',this)"><span class="segment-item-label">$1 Million+</span><span class="segment-item-count">4</span></div><div class="segment-item" onclick="segClick('$500K-$1M','wealth',this)"><span class="segment-item-label">$500K – $1M</span><span class="segment-item-count">6</span></div><div class="segment-item" onclick="segClick('$250K-$500K','wealth',this)"><span class="segment-item-label">$250K – $500K</span><span class="segment-item-count">9</span></div><div class="segment-item" onclick="segClick('Under $250K','wealth',this)"><span class="segment-item-label">Under $250K</span><span class="segment-item-count">6</span></div></div></div>
+                <div class="segment-card"><div class="segment-header"><span class="segment-title">Advisor Status</span><span class="segment-icon">🎯</span></div><div style="font-size:9px;color:var(--text-muted);margin:-6px 0 6px;font-style:italic">Estimated from wealth, age & investor signals</div><div class="segment-items"><div class="segment-item" onclick="segClick('Likely Advised','advisor',this)"><span class="segment-item-label">Likely Advised</span><span class="segment-item-count">0</span></div><div class="segment-item" onclick="segClick('Possibly Advised','advisor',this)"><span class="segment-item-label">Possibly Advised</span><span class="segment-item-count">0</span></div><div class="segment-item" onclick="segClick('Likely Unadvised','advisor',this)"><span class="segment-item-label">Likely Unadvised</span><span class="segment-item-count">0</span></div></div></div>
+                <div class="segment-card"><div class="segment-header"><span class="segment-title">Investor Type</span><span class="segment-icon">📈</span></div><div class="segment-items"><div class="segment-item" onclick="segClick('High-Conviction','investor',this)"><span class="segment-item-label">High-Conviction</span><span class="segment-item-count">3</span></div><div class="segment-item" onclick="segClick('Active Investor','investor',this)"><span class="segment-item-label">Active Investor</span><span class="segment-item-count">7</span></div><div class="segment-item" onclick="segClick('Open to Advice','investor',this)"><span class="segment-item-label">Open to Advice</span><span class="segment-item-count">9</span></div><div class="segment-item" onclick="segClick('Not Yet Investing','investor',this)"><span class="segment-item-label">Not Yet Investing</span><span class="segment-item-count">6</span></div></div></div>
+                <div class="segment-card"><div class="segment-header"><span class="segment-title">Home Value</span><span class="segment-icon">🏠</span></div><div class="segment-items"><div class="segment-item" onclick="segClick('$500K+ Home','homeVal',this)"><span class="segment-item-label">$500K+</span><span class="segment-item-count">11</span></div><div class="segment-item" onclick="segClick('$300K-$500K Home','homeVal',this)"><span class="segment-item-label">$300K – $500K</span><span class="segment-item-count">9</span></div><div class="segment-item" onclick="segClick('$150K-$300K Home','homeVal',this)"><span class="segment-item-label">$150K – $300K</span><span class="segment-item-count">5</span></div><div class="segment-item" onclick="segClick('Under $150K Home','homeVal',this)"><span class="segment-item-label">Under $150K</span><span class="segment-item-count">0</span></div></div></div>
+            </div>
+        </div>
+        <div class="segments-section"><div class="segments-grid">
+            <div class="segment-card"><div class="segment-header"><span class="segment-title">Age Range</span><span class="segment-icon">🎂</span></div><div class="segment-items"><div class="segment-item" onclick="segClick('60+','age',this)"><span class="segment-item-label">60+ years</span><span class="segment-item-count">16</span></div><div class="segment-item" onclick="segClick('50-59','age',this)"><span class="segment-item-label">50–59 years</span><span class="segment-item-count">6</span></div><div class="segment-item" onclick="segClick('40-49','age',this)"><span class="segment-item-label">40–49 years</span><span class="segment-item-count">3</span></div><div class="segment-item" onclick="segClick('Under 40','age',this)"><span class="segment-item-label">Under 40</span><span class="segment-item-count">0</span></div></div></div>
+            <div class="segment-card"><div class="segment-header"><span class="segment-title">Occupation</span><span class="segment-icon">💼</span></div><div class="segment-items"><div class="segment-item" onclick="segClick('Professional','occupation',this)"><span class="segment-item-label">Professional / Technical</span><span class="segment-item-count">7</span></div><div class="segment-item" onclick="segClick('Management','occupation',this)"><span class="segment-item-label">Management / Admin</span><span class="segment-item-count">3</span></div><div class="segment-item" onclick="segClick('Sales','occupation',this)"><span class="segment-item-label">Sales / Marketing</span><span class="segment-item-count">4</span></div><div class="segment-item" onclick="segClick('Business Owner','occupation',this)"><span class="segment-item-label">Business Owner</span><span class="segment-item-count">2</span></div></div></div>
+            <div class="segment-card"><div class="segment-header"><span class="segment-title">Household Income</span><span class="segment-icon">💵</span></div><div class="segment-items"><div class="segment-item" onclick="segClick('$200K+','income',this)"><span class="segment-item-label">$200K+</span><span class="segment-item-count">6</span></div><div class="segment-item" onclick="segClick('$100K-$200K','income',this)"><span class="segment-item-label">$100K – $200K</span><span class="segment-item-count">10</span></div><div class="segment-item" onclick="segClick('$50K-$100K','income',this)"><span class="segment-item-label">$50K – $100K</span><span class="segment-item-count">6</span></div><div class="segment-item" onclick="segClick('Under $50K','income',this)"><span class="segment-item-label">Under $50K</span><span class="segment-item-count">3</span></div></div></div>
+            <div class="segment-card"><div class="segment-header"><span class="segment-title">Lifestyle Interests</span><span class="segment-icon">🎯</span></div><div class="segment-items"><div class="segment-item" onclick="segClick('Investments & Finance','lifestyle',this)"><span class="segment-item-label">Investments & Finance</span><span class="segment-item-count">17</span></div><div class="segment-item" onclick="segClick('Golf','lifestyle',this)"><span class="segment-item-label">Golf</span><span class="segment-item-count">10</span></div><div class="segment-item" onclick="segClick('Travel','lifestyle',this)"><span class="segment-item-label">Travel & Cruises</span><span class="segment-item-count">16</span></div><div class="segment-item" onclick="segClick('Gourmet Food & Wine','lifestyle',this)"><span class="segment-item-label">Gourmet Food & Wine</span><span class="segment-item-count">13</span></div></div></div>
+        </div></div>
+        </div></div>
+        <div class="data-coverage-banner" style="background:var(--accent-gold-dim);border:1px solid rgba(201,162,39,0.3);border-radius:8px;padding:10px 16px;margin-bottom:20px;font-size:12px;display:flex;align-items:center;gap:10px">
+            <span>⚠️</span><span>Data coverage: <strong style="color:var(--accent-gold)">28 of 38 registrants (74%)</strong> matched with consumer records. Wealth, income, home, and lifestyle data shown for matched records only.</span>
+        </div>
+        <footer class="footer"><div>Data: LeadJig + Consumer Data Append (492 enrichment fields) • Sample data for demonstration</div><div>Report ID: PWM-2026-0128-PRE-V5</div></footer>
+    </div>
+    <div class="modal-overlay" id="modal" onclick="if(event.target===this) closeModal()">
+        <div class="modal">
+            <div class="modal-header"><div class="modal-title-area"><div class="modal-icon" id="modal-icon">📊</div><div><div class="modal-title" id="modal-title">Drill-Down</div><div class="modal-subtitle" id="modal-subtitle">Details</div></div></div><button class="modal-close" onclick="closeModal()">×</button></div>
+            <div class="modal-body" id="modal-body"></div>
+        </div>
+    </div>
+    <script>
+    const morningProspects = [
+    {id:1, name:'Patricia Hoffman', age:67, title:'Retired Executive', company:'', city:'Wilton Manors', married:true, children:2, homeowner:true, donor:true, wealthTier:4, wealth:'$1M+', incomeTier:4, income:'$200K+', homeValue:'$900K – $999K', investorTier:4, investorType:'High-Conviction', matchScore:99, persona:'Crème de la Crème', occupation:'Retired', interests:{finance:true, golf:true, travel:true, wine:true}, phone:'(954) 555-0142', email:'phoffman@gmail.com', address:'2215 NE 9th Ave'},
+    {id:2, name:'Robert Delgado', householdId:'hm1', age:72, title:'Retired Attorney', company:'', city:'Fort Lauderdale', married:true, children:3, homeowner:true, donor:true, wealthTier:4, wealth:'$1M+', incomeTier:4, income:'$200K+', homeValue:'$1,000,000+', investorTier:4, investorType:'High-Conviction', matchScore:99, persona:'Crème de la Crème', occupation:'Retired', interests:{finance:true, golf:true, travel:true, wine:false}, phone:'(954) 555-0287', email:'rdelgado@aol.com', address:'1440 E Las Olas Blvd'},
+    {id:3, name:'Margaret Chen', age:64, title:'Business Owner', company:'Chen Interiors LLC', city:'Oakland Park', married:true, children:1, homeowner:true, donor:false, wealthTier:4, wealth:'$1M+', incomeTier:4, income:'$200K+', homeValue:'$800K – $900K', investorTier:3, investorType:'Active Investor', matchScore:99, persona:'Portfolios & Passports', occupation:'Management', interests:{finance:true, golf:false, travel:true, wine:true}, phone:'(954) 555-0331', email:'mchen@cheninteriors.com', address:'1087 NE 34th St'},
+    {id:4, name:'Richard Vasquez', age:69, title:'Retired Surgeon', company:'', city:'Wilton Manors', married:true, children:2, homeowner:true, donor:true, wealthTier:4, wealth:'$1M+', incomeTier:3, income:'$100K – $200K', homeValue:'$1,000,000+', investorTier:3, investorType:'Active Investor', matchScore:98, persona:'Crème de la Crème', occupation:'Retired', interests:{finance:true, golf:true, travel:true, wine:true}, phone:'(954) 555-0418', email:'rvasquez@me.com', address:'2601 NE 14th Ave'},
+    {id:5, name:'Gloria Baptiste', age:61, title:'Financial Controller', company:'Nova SE University', city:'Pompano Beach', married:false, children:0, homeowner:true, donor:true, wealthTier:3, wealth:'$500K – $1M', incomeTier:4, income:'$200K+', homeValue:'$700K – $800K', investorTier:4, investorType:'High-Conviction', matchScore:96, persona:'Portfolios & Passports', occupation:'Professional', interests:{finance:true, golf:false, travel:true, wine:false}, phone:'(954) 555-0502', email:'gbaptiste@nova.edu', address:'412 SE 3rd Ave'},
+    {id:6, name:'William Torres', age:58, title:'VP Operations', company:'AutoNation', city:'Fort Lauderdale', married:true, children:2, homeowner:true, donor:false, wealthTier:3, wealth:'$500K – $1M', incomeTier:4, income:'$200K+', homeValue:'$600K – $700K', investorTier:3, investorType:'Active Investor', matchScore:93, persona:'Country Club Conservatives', occupation:'Management', interests:{finance:true, golf:true, travel:false, wine:true}, phone:'(954) 555-0619', email:'wtorres@autonation.com', address:'733 Bayshore Dr'},
+    {id:7, name:'Karen Mitchell', age:63, title:'Retired Teacher', company:'', city:'Wilton Manors', married:true, children:3, homeowner:true, donor:true, wealthTier:3, wealth:'$500K – $1M', incomeTier:2, income:'$50K – $100K', homeValue:'$500K – $600K', investorTier:2, investorType:'Open to Advice', matchScore:84, persona:'Actively Retired', occupation:'Retired', interests:{finance:false, golf:false, travel:true, wine:true}, phone:'(954) 555-0744', email:'kmitchell@yahoo.com', address:'1920 NE 5th Ct'},
+    {id:8, name:'Thomas Beaumont', householdId:'hm2', age:71, title:'Retired Engineer', company:'', city:'Lighthouse Point', married:true, children:2, homeowner:true, donor:false, wealthTier:3, wealth:'$500K – $1M', incomeTier:3, income:'$100K – $200K', homeValue:'$700K – $800K', investorTier:3, investorType:'Active Investor', matchScore:91, persona:'Country Club Conservatives', occupation:'Retired', interests:{finance:true, golf:true, travel:true, wine:false}, phone:'(954) 555-0855', email:'tbeaumont@comcast.net', address:'2340 NE 28th St'},
+    {id:9, name:'Sandra Okonkwo', age:55, title:'HR Director', company:'Broward Health', city:'Oakland Park', married:true, children:2, homeowner:true, donor:false, wealthTier:2, wealth:'$250K – $500K', incomeTier:3, income:'$100K – $200K', homeValue:'$450K – $500K', investorTier:2, investorType:'Open to Advice', matchScore:80, persona:'Boomer Barons', occupation:'Professional', interests:{finance:true, golf:false, travel:true, wine:false}, phone:'(954) 555-0963', email:'sokonkwo@browardhealth.org', address:'4401 NE 16th Ter'},
+    {id:10, name:'Daniel Pratt', householdId:'hm3', age:66, title:'Business Owner', company:'Pratt Marine Services', city:'Pompano Beach', married:true, children:1, homeowner:true, donor:true, wealthTier:3, wealth:'$500K – $1M', incomeTier:3, income:'$100K – $200K', homeValue:'$600K – $700K', investorTier:2, investorType:'Open to Advice', matchScore:86, persona:'Country Club Conservatives', occupation:'Sales', interests:{finance:false, golf:true, travel:true, wine:true}, phone:'(954) 555-1077', email:'dan@prattmarine.com', address:'901 N Ocean Blvd'},
+    {id:11, name:'Jennifer Nguyen', age:48, title:'Estate Attorney', company:'Nguyen Law Group', city:'Fort Lauderdale', married:true, children:2, homeowner:true, donor:false, wealthTier:2, wealth:'$250K – $500K', incomeTier:3, income:'$100K – $200K', homeValue:'$500K – $600K', investorTier:3, investorType:'Active Investor', matchScore:88, persona:'Portfolios & Passports', occupation:'Professional', interests:{finance:true, golf:false, travel:true, wine:true}, phone:'(954) 555-1188', email:'jnguyen@nguyenlaw.com', address:'110 SE 6th St'},
+    {id:12, name:'Charles Whitfield', age:73, title:'Retired Dentist', company:'', city:'Wilton Manors', married:false, children:1, homeowner:true, donor:true, wealthTier:3, wealth:'$500K – $1M', incomeTier:2, income:'$50K – $100K', homeValue:'$450K – $500K', investorTier:2, investorType:'Open to Advice', matchScore:79, persona:'Actively Retired', occupation:'Retired', interests:{finance:true, golf:true, travel:false, wine:false}, phone:'(954) 555-1299', email:'cwhitfield@gmail.com', address:'820 NE 20th Dr'},
+    {id:13, name:'Barbara Santiago', age:60, title:'Sales Director', company:'Citrix Systems', city:'Coral Springs', married:true, children:3, homeowner:true, donor:false, wealthTier:2, wealth:'$250K – $500K', incomeTier:3, income:'$100K – $200K', homeValue:'$400K – $450K', investorTier:2, investorType:'Open to Advice', matchScore:77, persona:'Boomer Barons', occupation:'Sales', interests:{finance:true, golf:false, travel:false, wine:true}, phone:'(954) 555-1344', email:'bsantiago@citrix.com', address:'5520 W Sample Rd'},
+    {id:14, name:'Steven Morales', age:52, title:'IT Manager', company:'Spirit Airlines', city:'Dania Beach', married:true, children:1, homeowner:true, donor:false, wealthTier:2, wealth:'$250K – $500K', incomeTier:3, income:'$100K – $200K', homeValue:'$350K – $400K', investorTier:2, investorType:'Open to Advice', matchScore:75, persona:'Suburban Sensibles', occupation:'Professional', interests:{finance:true, golf:false, travel:true, wine:false}, phone:'(954) 555-1455', email:'smorales@spirit.com', address:'300 Gulf Stream Way'},
+    {id:15, name:'Linda Prescott', age:68, title:'Retired Nurse', company:'', city:'Wilton Manors', married:true, children:2, homeowner:true, donor:true, wealthTier:2, wealth:'$250K – $500K', incomeTier:2, income:'$50K – $100K', homeValue:'$400K – $450K', investorTier:1, investorType:'Not Yet Investing', matchScore:70, persona:'Actively Retired', occupation:'Retired', interests:{finance:false, golf:false, travel:true, wine:true}, phone:'(954) 555-1566', email:'lprescott@att.net', address:'1205 NE 4th Ave'},
+    {id:16, name:'James Alderman', age:59, title:'Commercial Realtor', company:'CBRE', city:'Fort Lauderdale', married:false, children:0, homeowner:true, donor:false, wealthTier:2, wealth:'$250K – $500K', incomeTier:3, income:'$100K – $200K', homeValue:'$350K – $400K', investorTier:3, investorType:'Active Investor', matchScore:82, persona:'Portfolios & Passports', occupation:'Sales', interests:{finance:true, golf:true, travel:true, wine:false}, phone:'(954) 555-1677', email:'jalderman@cbre.com', address:'401 E Las Olas Blvd'},
+    {id:17, name:'Nancy Dupree', age:74, title:'Retired Principal', company:'', city:'Oakland Park', married:true, children:4, homeowner:true, donor:true, wealthTier:2, wealth:'$250K – $500K', incomeTier:2, income:'$50K – $100K', homeValue:'$300K – $350K', investorTier:1, investorType:'Not Yet Investing', matchScore:67, persona:'Actively Retired', occupation:'Retired', interests:{finance:false, golf:false, travel:false, wine:true}, phone:'(954) 555-1788', email:'ndupree@bellsouth.net', address:'3620 NE 12th Ave'},
+    {id:18, name:'David Hartley', age:50, title:'Franchise Owner', company:'Hartley Auto Group', city:'Pompano Beach', married:true, children:3, homeowner:true, donor:false, wealthTier:2, wealth:'$250K – $500K', incomeTier:4, income:'$200K+', homeValue:'$500K – $600K', investorTier:2, investorType:'Open to Advice', matchScore:83, persona:'Country Club Conservatives', occupation:'Management', interests:{finance:true, golf:true, travel:false, wine:true}, phone:'(954) 555-1899', email:'david@hartleyauto.com', address:'2700 N Federal Hwy'},
+    {id:19, name:'Susan Ramirez', age:62, title:'CPA', company:'Ramirez & Associates', city:'Wilton Manors', married:true, children:1, homeowner:true, donor:false, wealthTier:2, wealth:'$250K – $500K', incomeTier:3, income:'$100K – $200K', homeValue:'$400K – $450K', investorTier:3, investorType:'Active Investor', matchScore:85, persona:'Portfolios & Passports', occupation:'Professional', interests:{finance:true, golf:false, travel:true, wine:false}, phone:'(954) 555-1944', email:'susan@ramirez-cpa.com', address:'2200 Wilton Dr'},
+    {id:20, name:'Joseph Tran', age:45, title:'Software Engineer', company:'Citadel', city:'Fort Lauderdale', married:true, children:2, homeowner:true, donor:false, wealthTier:1, wealth:'Under $250K', incomeTier:3, income:'$100K – $200K', homeValue:'$300K – $350K', investorTier:2, investorType:'Open to Advice', matchScore:72, persona:'Suburban Sensibles', occupation:'Professional', interests:{finance:true, golf:false, travel:true, wine:false}, phone:'(954) 555-2055', email:'jtran@citadel.com', address:'815 SE 4th Ct'},
+    {id:21, name:'Betty Fontaine', age:76, title:'Retired', company:'', city:'Lighthouse Point', married:false, children:2, homeowner:true, donor:true, wealthTier:1, wealth:'Under $250K', incomeTier:1, income:'Under $50K', homeValue:'$250K – $300K', investorTier:1, investorType:'Not Yet Investing', matchScore:60, persona:'Actively Retired', occupation:'Retired', interests:{finance:false, golf:false, travel:false, wine:false}, phone:'(954) 555-2166', email:'bfontaine@yahoo.com', address:'4401 N Federal Hwy'},
+    {id:22, name:'Kevin Brooks', age:43, title:'Account Executive', company:'ADT Security', city:'Coral Springs', married:true, children:1, homeowner:true, donor:false, wealthTier:1, wealth:'Under $250K', incomeTier:2, income:'$50K – $100K', homeValue:'$250K – $300K', investorTier:1, investorType:'Not Yet Investing', matchScore:57, persona:'Suburban Sensibles', occupation:'Sales', interests:{finance:false, golf:true, travel:false, wine:false}, phone:'(954) 555-2277', email:'kbrooks@adt.com', address:'9901 W Sample Rd'},
+    {id:23, name:'Dorothy Wallace', age:70, title:'Retired Librarian', company:'', city:'Wilton Manors', married:true, children:3, homeowner:true, donor:true, wealthTier:1, wealth:'Under $250K', incomeTier:1, income:'Under $50K', homeValue:'$200K – $250K', investorTier:1, investorType:'Not Yet Investing', matchScore:54, persona:'Actively Retired', occupation:'Retired', interests:{finance:false, golf:false, travel:true, wine:false}, phone:'(954) 555-2388', email:'dwallace@gmail.com', address:'609 NE 21st Ct'},
+    {id:24, name:'Ronald Mejia', age:56, title:'Project Manager', company:'Motorola Solutions', city:'Dania Beach', married:true, children:2, homeowner:true, donor:false, wealthTier:1, wealth:'Under $250K', incomeTier:2, income:'$50K – $100K', homeValue:'$200K – $250K', investorTier:2, investorType:'Open to Advice', matchScore:64, persona:'Suburban Sensibles', occupation:'Professional', interests:{finance:true, golf:false, travel:false, wine:true}, phone:'(954) 555-2499', email:'rmejia@motorola.com', address:'125 SW 2nd Ave'},
+    {id:25, name:'Carol Ashworth', age:65, title:'Retired Social Worker', company:'', city:'Oakland Park', married:false, children:1, homeowner:true, donor:true, wealthTier:1, wealth:'Under $250K', incomeTier:1, income:'Under $50K', homeValue:'$175K – $200K', investorTier:1, investorType:'Not Yet Investing', matchScore:52, persona:'Actively Retired', occupation:'Retired', interests:{finance:false, golf:false, travel:false, wine:true}, phone:'(954) 555-2544', email:'cashworth@comcast.net', address:'3200 NE 5th Ave'}
+,
+    {id:26, name:'Maria Delgado', householdId:'hm1', age:69, title:'Retired Professor', company:'', city:'Fort Lauderdale', married:true, children:3, homeowner:true, donor:true, wealthTier:4, wealth:'$1M+', incomeTier:3, income:'$100K – $200K', homeValue:'$1,000,000+', investorTier:2, investorType:'Open to Advice', matchScore:89, persona:'Crème de la Crème', occupation:'Retired', interests:{finance:false, golf:false, travel:true, wine:true}, phone:'(954) 555-0288', email:'mdelgado@fau.edu', address:'1440 E Las Olas Blvd'},
+    {id:27, name:'Janet Beaumont', householdId:'hm2', age:68, title:'Retired Teacher', company:'', city:'Lighthouse Point', married:true, children:2, homeowner:true, donor:false, wealthTier:3, wealth:'$500K – $1M', incomeTier:2, income:'$50K – $100K', homeValue:'$700K – $800K', investorTier:1, investorType:'Not Yet Investing', matchScore:65, persona:'Actively Retired', occupation:'Retired', interests:{finance:false, golf:false, travel:true, wine:true}, phone:'(954) 555-0856', email:'jbeaumont@comcast.net', address:'2340 NE 28th St'},
+    {id:28, name:'Suzanne Pratt', householdId:'hm3', age:63, title:'Office Manager', company:'Pratt Marine Services', city:'Pompano Beach', married:true, children:1, homeowner:true, donor:true, wealthTier:3, wealth:'$500K – $1M', incomeTier:2, income:'$50K – $100K', homeValue:'$600K – $700K', investorTier:1, investorType:'Not Yet Investing', matchScore:62, persona:'Country Club Conservatives', occupation:'Management', interests:{finance:false, golf:false, travel:true, wine:false}, phone:'(954) 555-1078', email:'suzanne@prattmarine.com', address:'901 N Ocean Blvd'}];
+const morningUnmatched = [
+    {name:'Frank Rosario'}, {name:'Theresa Blanchard'}, {name:'Paul DiMatteo'},
+    {name:'Sharon Kwame'}, {name:'Raymond Baptiste'}, {name:'Donna Albright'},
+    {name:'Kenneth Ortiz'}, {name:'Janet Fonseca'}, {name:'Victor Salgado'},
+    {name:'Lorraine Cho'}
+];
+
+    const eveningProspects = [
+    {id:1, name:'Michael Santana', householdId:'he1', age:54, title:'Managing Director', company:'Morgan Stanley', city:'Fort Lauderdale', married:true, children:2, homeowner:true, donor:true, wealthTier:4, wealth:'$1M+', incomeTier:4, income:'$200K+', homeValue:'$1,000,000+', investorTier:4, investorType:'High-Conviction', matchScore:99, persona:'Crème de la Crème', occupation:'Management', interests:{finance:true, golf:true, travel:true, wine:true}, phone:'(954) 555-3101', email:'msantana@ms.com', address:'3001 E Sunrise Blvd'},
+    {id:2, name:'Diana Rosenthal', age:61, title:'Retired Judge', company:'', city:'Wilton Manors', married:true, children:1, homeowner:true, donor:true, wealthTier:4, wealth:'$1M+', incomeTier:3, income:'$100K – $200K', homeValue:'$900K – $999K', investorTier:4, investorType:'High-Conviction', matchScore:99, persona:'Crème de la Crème', occupation:'Retired', interests:{finance:true, golf:false, travel:true, wine:true}, phone:'(954) 555-3215', email:'drosenthal@gmail.com', address:'2417 NE 12th Ave'},
+    {id:3, name:'Anthony Marchetti', age:58, title:'Business Owner', company:'Marchetti Development Group', city:'Pompano Beach', married:true, children:3, homeowner:true, donor:false, wealthTier:4, wealth:'$1M+', incomeTier:4, income:'$200K+', homeValue:'$1,000,000+', investorTier:3, investorType:'Active Investor', matchScore:99, persona:'Portfolios & Passports', occupation:'Management', interests:{finance:true, golf:true, travel:true, wine:false}, phone:'(954) 555-3329', email:'tony@marchettidev.com', address:'1500 N Ocean Blvd'},
+    {id:4, name:'Lisa Weatherly', age:49, title:'VP Marketing', company:'Kaplan Inc', city:'Fort Lauderdale', married:true, children:2, homeowner:true, donor:false, wealthTier:3, wealth:'$500K – $1M', incomeTier:4, income:'$200K+', homeValue:'$700K – $800K', investorTier:3, investorType:'Active Investor', matchScore:94, persona:'Portfolios & Passports', occupation:'Management', interests:{finance:true, golf:false, travel:true, wine:true}, phone:'(954) 555-3437', email:'lweatherly@kaplan.com', address:'600 SE 3rd Ave'},
+    {id:5, name:'Gregory Desmond', householdId:'he2', age:65, title:'Retired CPA', company:'', city:'Oakland Park', married:true, children:2, homeowner:true, donor:true, wealthTier:3, wealth:'$500K – $1M', incomeTier:3, income:'$100K – $200K', homeValue:'$600K – $700K', investorTier:3, investorType:'Active Investor', matchScore:90, persona:'Country Club Conservatives', occupation:'Retired', interests:{finance:true, golf:true, travel:false, wine:true}, phone:'(954) 555-3548', email:'gdesmond@bellsouth.net', address:'4801 NE 17th Ter'},
+    {id:6, name:'Maria Calderon', age:52, title:'Physician', company:'Broward Medical Group', city:'Wilton Manors', married:true, children:1, homeowner:true, donor:false, wealthTier:3, wealth:'$500K – $1M', incomeTier:4, income:'$200K+', homeValue:'$600K – $700K', investorTier:2, investorType:'Open to Advice', matchScore:87, persona:'Portfolios & Passports', occupation:'Professional', interests:{finance:false, golf:false, travel:true, wine:true}, phone:'(954) 555-3659', email:'mcalderon@browardmed.com', address:'2100 N Dixie Hwy'},
+    {id:7, name:'Robert Fleming', age:70, title:'Retired Pilot', company:'', city:'Lighthouse Point', married:true, children:2, homeowner:true, donor:true, wealthTier:3, wealth:'$500K – $1M', incomeTier:2, income:'$50K – $100K', homeValue:'$500K – $600K', investorTier:2, investorType:'Open to Advice', matchScore:81, persona:'Actively Retired', occupation:'Retired', interests:{finance:true, golf:true, travel:true, wine:false}, phone:'(954) 555-3766', email:'rfleming@me.com', address:'2240 NE 36th St'},
+    {id:8, name:'Pamela Thornton', age:57, title:'School Principal', company:'Broward County Schools', city:'Coral Springs', married:true, children:3, homeowner:true, donor:false, wealthTier:2, wealth:'$250K – $500K', incomeTier:3, income:'$100K – $200K', homeValue:'$450K – $500K', investorTier:2, investorType:'Open to Advice', matchScore:78, persona:'Boomer Barons', occupation:'Professional', interests:{finance:true, golf:false, travel:false, wine:true}, phone:'(954) 555-3877', email:'pthornton@browardschools.com', address:'10300 Wiles Rd'},
+    {id:9, name:'Edward Nakamura', age:46, title:'Software Architect', company:'Magic Leap', city:'Dania Beach', married:true, children:2, homeowner:true, donor:false, wealthTier:2, wealth:'$250K – $500K', incomeTier:3, income:'$100K – $200K', homeValue:'$400K – $450K', investorTier:3, investorType:'Active Investor', matchScore:83, persona:'Suburban Sensibles', occupation:'Professional', interests:{finance:true, golf:false, travel:true, wine:false}, phone:'(954) 555-3988', email:'enakamura@magicleap.com', address:'550 SW 12th Ave'},
+    {id:10, name:'Catherine Dubois', age:68, title:'Retired Professor', company:'', city:'Wilton Manors', married:false, children:1, homeowner:true, donor:true, wealthTier:2, wealth:'$250K – $500K', incomeTier:2, income:'$50K – $100K', homeValue:'$400K – $450K', investorTier:2, investorType:'Open to Advice', matchScore:76, persona:'Actively Retired', occupation:'Retired', interests:{finance:true, golf:false, travel:true, wine:true}, phone:'(954) 555-4099', email:'cdubois@fau.edu', address:'1620 NE 8th Ave'},
+    {id:11, name:'Mark Gallagher', age:53, title:'Regional Sales Dir', company:'Waste Management', city:'Pompano Beach', married:true, children:2, homeowner:true, donor:false, wealthTier:2, wealth:'$250K – $500K', incomeTier:3, income:'$100K – $200K', homeValue:'$350K – $400K', investorTier:2, investorType:'Open to Advice', matchScore:74, persona:'Country Club Conservatives', occupation:'Sales', interests:{finance:false, golf:true, travel:false, wine:true}, phone:'(954) 555-4155', email:'mgallagher@wm.com', address:'800 SW 2nd St'},
+    {id:12, name:'Angela Baptiste', age:44, title:'Nurse Practitioner', company:'Cleveland Clinic FL', city:'Oakland Park', married:true, children:1, homeowner:true, donor:false, wealthTier:2, wealth:'$250K – $500K', incomeTier:3, income:'$100K – $200K', homeValue:'$350K – $400K', investorTier:1, investorType:'Not Yet Investing', matchScore:69, persona:'Suburban Sensibles', occupation:'Professional', interests:{finance:false, golf:false, travel:true, wine:false}, phone:'(954) 555-4266', email:'abaptiste@ccf.org', address:'3900 NE 10th Ter'},
+    {id:13, name:'Philip Kowalski', age:62, title:'Franchise Owner', company:'Kowalski Holdings', city:'Fort Lauderdale', married:true, children:2, homeowner:true, donor:true, wealthTier:2, wealth:'$250K – $500K', incomeTier:3, income:'$100K – $200K', homeValue:'$450K – $500K', investorTier:2, investorType:'Open to Advice', matchScore:80, persona:'Country Club Conservatives', occupation:'Management', interests:{finance:true, golf:true, travel:false, wine:false}, phone:'(954) 555-4377', email:'phil@kowalskiholdings.com', address:'1845 Cordova Rd'},
+    {id:14, name:'Sandra Lovett', age:71, title:'Retired RN', company:'', city:'Wilton Manors', married:true, children:3, homeowner:true, donor:true, wealthTier:1, wealth:'Under $250K', incomeTier:1, income:'Under $50K', homeValue:'$250K – $300K', investorTier:1, investorType:'Not Yet Investing', matchScore:58, persona:'Actively Retired', occupation:'Retired', interests:{finance:false, golf:false, travel:false, wine:true}, phone:'(954) 555-4488', email:'slovett@att.net', address:'915 NE 19th Ave'},
+    {id:15, name:'Jason Reeves', age:41, title:'Financial Analyst', company:'Citadel', city:'Fort Lauderdale', married:true, children:1, homeowner:true, donor:false, wealthTier:1, wealth:'Under $250K', incomeTier:3, income:'$100K – $200K', homeValue:'$300K – $350K', investorTier:3, investorType:'Active Investor', matchScore:75, persona:'Suburban Sensibles', occupation:'Professional', interests:{finance:true, golf:false, travel:true, wine:false}, phone:'(954) 555-4599', email:'jreeves@citadel.com', address:'500 SE 5th Ave'},
+    {id:16, name:'Evelyn St. Pierre', age:67, title:'Retired Social Worker', company:'', city:'Oakland Park', married:false, children:2, homeowner:true, donor:true, wealthTier:1, wealth:'Under $250K', incomeTier:1, income:'Under $50K', homeValue:'$200K – $250K', investorTier:1, investorType:'Not Yet Investing', matchScore:55, persona:'Actively Retired', occupation:'Retired', interests:{finance:false, golf:false, travel:true, wine:false}, phone:'(954) 555-4655', email:'estpierre@yahoo.com', address:'3410 NE 11th Ave'},
+    {id:17, name:'Dennis Gutierrez', age:55, title:'Construction Mgr', company:'Moss Construction', city:'Dania Beach', married:true, children:2, homeowner:true, donor:false, wealthTier:1, wealth:'Under $250K', incomeTier:2, income:'$50K – $100K', homeValue:'$250K – $300K', investorTier:1, investorType:'Not Yet Investing', matchScore:59, persona:'Suburban Sensibles', occupation:'Professional', interests:{finance:false, golf:true, travel:false, wine:false}, phone:'(954) 555-4766', email:'dgutierrez@mosscm.com', address:'200 SW 1st Ave'},
+    {id:18, name:'Natalie Cummings', age:48, title:'Dental Practice Owner', company:'Bright Smiles', city:'Wilton Manors', married:true, children:2, homeowner:true, donor:false, wealthTier:2, wealth:'$250K – $500K', incomeTier:4, income:'$200K+', homeValue:'$500K – $600K', investorTier:2, investorType:'Open to Advice', matchScore:84, persona:'Portfolios & Passports', occupation:'Professional', interests:{finance:true, golf:false, travel:true, wine:true}, phone:'(954) 555-4877', email:'ncummings@brightsmiles.com', address:'2500 Wilton Dr'},
+    {id:19, name:'Harold Pham', age:73, title:'Retired Pharmacist', company:'', city:'Pompano Beach', married:true, children:1, homeowner:true, donor:false, wealthTier:2, wealth:'$250K – $500K', incomeTier:2, income:'$50K – $100K', homeValue:'$300K – $350K', investorTier:2, investorType:'Open to Advice', matchScore:70, persona:'Actively Retired', occupation:'Retired', interests:{finance:true, golf:false, travel:false, wine:false}, phone:'(954) 555-4988', email:'hpham@comcast.net', address:'1200 N Ocean Blvd'},
+    {id:20, name:'Kimberly Ashford', age:50, title:'Interior Designer', company:'Ashford Design Studio', city:'Fort Lauderdale', married:false, children:0, homeowner:true, donor:false, wealthTier:1, wealth:'Under $250K', incomeTier:2, income:'$50K – $100K', homeValue:'$300K – $350K', investorTier:1, investorType:'Not Yet Investing', matchScore:61, persona:'Boomer Barons', occupation:'Professional', interests:{finance:false, golf:false, travel:true, wine:true}, phone:'(954) 555-5099', email:'kim@ashforddesign.com', address:'710 E Broward Blvd'},
+    {id:21, name:'Walter Brennan', age:69, title:'Retired Marine', company:'', city:'Coral Springs', married:true, children:4, homeowner:true, donor:true, wealthTier:1, wealth:'Under $250K', incomeTier:2, income:'$50K – $100K', homeValue:'$250K – $300K', investorTier:1, investorType:'Not Yet Investing', matchScore:56, persona:'Actively Retired', occupation:'Retired', interests:{finance:false, golf:true, travel:false, wine:false}, phone:'(954) 555-5155', email:'wbrennan@gmail.com', address:'11500 Heron Bay Blvd'},
+    {id:22, name:'Rachel Simmons', age:39, title:'Marketing Manager', company:'Ultimate Software', city:'Dania Beach', married:true, children:1, homeowner:false, donor:false, wealthTier:1, wealth:'Under $250K', incomeTier:2, income:'$50K – $100K', homeValue:'$175K – $200K', investorTier:2, investorType:'Open to Advice', matchScore:62, persona:'Suburban Sensibles', occupation:'Professional', interests:{finance:true, golf:false, travel:true, wine:false}, phone:'(954) 555-5266', email:'rsimmons@ultimate.com', address:'401 SW 4th Ave'}
+,
+    {id:23, name:'Elena Santana', householdId:'he1', age:51, title:'Dermatologist', company:'Santana Dermatology', city:'Fort Lauderdale', married:true, children:2, homeowner:true, donor:true, wealthTier:3, wealth:'$500K – $1M', incomeTier:4, income:'$200K+', homeValue:'$1,000,000+', investorTier:2, investorType:'Open to Advice', matchScore:85, persona:'Portfolios & Passports', occupation:'Professional', interests:{finance:false, golf:false, travel:true, wine:true}, phone:'(954) 555-3102', email:'esantana@santanaderm.com', address:'3001 E Sunrise Blvd'},
+    {id:24, name:'Judith Desmond', householdId:'he2', age:63, title:'Retired Bookkeeper', company:'', city:'Oakland Park', married:true, children:2, homeowner:true, donor:true, wealthTier:3, wealth:'$500K – $1M', incomeTier:2, income:'$50K – $100K', homeValue:'$600K – $700K', investorTier:1, investorType:'Not Yet Investing', matchScore:64, persona:'Actively Retired', occupation:'Retired', interests:{finance:true, golf:false, travel:false, wine:true}, phone:'(954) 555-3549', email:'jdesmond@bellsouth.net', address:'4801 NE 17th Ter'}];
+const eveningUnmatched = [
+    {name:'Alejandro Fuentes'}, {name:'Priscilla Monroe'}, {name:'Carlton Hayes'},
+    {name:'Yolanda Craft'}, {name:'Mitchell Stein'}, {name:'Brenda Toussaint'},
+    {name:'Jerome Adkins'}, {name:'Claudia Espinoza'}
+];
+
+    let prospects = morningProspects;
+    let currentUnmatched = morningUnmatched;
+    const weights = { worth: 35, income: 25, investor: 25, home: 15 };
+
+    let currentEventDate = 'morning';
+    function setEventDate(date) {
+        currentEventDate = date;
+        document.getElementById('tab-morning').classList.toggle('active', date === 'morning');
+        document.getElementById('tab-evening').classList.toggle('active', date === 'evening');
+        // Phase 4: swap prospect data and recalculate everything
+        swapEventData(date);
+    }
+    function swapEventData(date) {
+        // Swap prospect data
+        prospects = date === 'morning' ? morningProspects : eveningProspects;
+        currentUnmatched = date === 'morning' ? morningUnmatched : eveningUnmatched;
+        
+        // Clear filters
+        activeFilters = [];
+        
+        // Update hero stat numbers
+        const totalReg = prospects.length + currentUnmatched.length;
+        const matched = prospects.length;
+        const unmatched = currentUnmatched.length;
+        
+        // Recalculate wealth
+        const wealthMap = {4: 1250000, 3: 750000, 2: 375000, 1: 125000};
+        const totalWealth = prospects.reduce((s, p) => s + (wealthMap[p.wealthTier] || 0), 0);
+        const avgWealth = Math.round(totalWealth / matched / 1000);
+        
+        // Recalculate match score
+        const avgScore = (prospects.reduce((s, p) => s + calculateScore(p), 0) / matched / 10).toFixed(1);
+        const scored8plus = prospects.filter(p => calculateScore(p) >= 80).length;
+        
+        // Top targets - recalculate from current prospects
+        const topTargets = prospects.filter(p => p.wealthTier >= 3 || p.investorTier >= 4);
+        const topCount = topTargets.length;
+        
+        // Drive time - morning event draws more local retirees, evening draws wider commuters
+        const avgDrive = date === 'morning' ? 14 : 18;
+        const driveRadius = date === 'morning' ? 12 : 15;
+        
+        // Direct DOM updates for hero cards
+        const heroCards = document.querySelectorAll('.hero-stat');
+        // Total Registrants
+        heroCards[0].querySelector('.stat-value').dataset.count = totalReg;
+        heroCards[0].querySelector('.stat-value').textContent = totalReg;
+        var households = countHouseholds(prospects);
+        heroCards[0].querySelector('.stat-sub').textContent = matched + ' matched · ' + households + ' households · ' + unmatched + ' unmatched';
+        heroCards[0].querySelector('.stat-sub').dataset.express = matched + ' matched · ' + households + ' households · ' + unmatched + ' unmatched';
+        heroCards[0].querySelector('.stat-sub').dataset.performance = households + ' households';
+        
+        // Wealth
+        const wealthStr = totalWealth >= 1000000 ? '$' + (totalWealth / 1000000).toFixed(1) + 'M' : '$' + Math.round(totalWealth / 1000) + 'K';
+        heroCards[1].querySelector('.stat-value').dataset.count = totalWealth;
+        heroCards[1].querySelector('.stat-value').textContent = wealthStr;
+        heroCards[1].querySelector('.stat-sub').textContent = 'Based on ' + matched + ' of ' + totalReg + ' registrants (' + countHouseholds(prospects) + ' households)';
+        heroCards[1].querySelector('.stat-sub').dataset.express = 'Based on ' + matched + ' of ' + totalReg + ' registrants (' + countHouseholds(prospects) + ' households)';
+        
+        // Match Score - recalculate and update data-count for animation
+        heroCards[2].querySelector('.stat-value span[data-count]').dataset.count = avgScore;
+        heroCards[2].querySelector('.stat-value span[data-count]').textContent = avgScore;
+        var hhCount = countHouseholds(prospects);
+        heroCards[2].querySelector('.stat-sub').textContent = matched + ' matched · ' + hhCount + ' households';
+        heroCards[2].querySelector('.stat-sub').dataset.express = matched + ' matched · ' + hhCount + ' households';
+        
+        // Top Targets
+        // Drive Time
+        heroCards[3].querySelector('.stat-value span[data-count]').dataset.count = avgDrive;
+        heroCards[3].querySelector('.stat-value span[data-count]').textContent = avgDrive;
+        heroCards[3].querySelector('.stat-sub').textContent = 'Within ' + driveRadius + ' mi radius';
+        
+        // Top Targets
+        var topTargetsCard = document.querySelector('.top-targets-card');
+        if (topTargetsCard) {
+            topTargetsCard.querySelector('.stat-value').dataset.count = topCount;
+            topTargetsCard.querySelector('.stat-value').textContent = topCount;
+            topTargetsCard.querySelector('.stat-sub').textContent = '★ ' + topTargets.length + ' priority prospects';
+        }
+        
+        // Update segment counts
+        updateSegmentCounts();
+        
+        // Re-render dynamic sections
+        renderStarters();
+        renderQuickStats();
+        
+        // Re-animate hero counters
+        animateCounters();
+        closeModal();
+        
+        // Update data coverage banner
+        var banner = document.querySelector('.data-coverage-banner span:last-child');
+        if (banner) banner.innerHTML = 'Data coverage: <strong style="color:var(--accent-gold)">' + matched + ' of ' + totalReg + ' registrants (' + Math.round(matched/totalReg*100) + '%)</strong> matched with consumer records. Wealth, income, home, and lifestyle data shown for matched records only.';
+        
+        // Re-apply mode-specific text if in performance
+        if (currentEventDate !== 'express') {
+            var mode = document.documentElement.dataset.mode;
+            document.querySelectorAll('[data-' + mode + ']').forEach(function(el) {
+                if (el.dataset[mode]) el.textContent = el.dataset[mode];
+            });
+        }
+    }
+    
+    function updateSegmentCounts() {
+        // Recalculate all segment item counts based on current prospects
+        var segItems = document.querySelectorAll('.segment-item');
+        segItems.forEach(function(el) {
+            var onclick = el.getAttribute('onclick') || '';
+            var match = onclick.match(/segClick\('([^']+)','([^']+)'/);
+            if (!match) return;
+            var label = match[1], type = match[2];
+            var count = prospects.filter(function(p) { return matchesFilter(p, {label: label, type: type}); }).length;
+            var countEl = el.querySelector('.segment-item-count');
+            if (countEl) countEl.textContent = count;
+        });
+    }
+    let activeFilters = [];
+    // unmatched data is now in morningUnmatched / eveningUnmatched
+    const personaDescriptions = {'Crème de la Crème':'Ultra-affluent executives & physicians','Country Club Conservatives':'High-income business owners, traditional values','Portfolios & Passports':'Affluent professionals who invest & travel','Actively Retired':'Retirees with solid assets who stay engaged','Connected Couples':'Dual-income couples building wealth together','Left Turns & Straightaways':'Active lifestyle, mid-tier income earners','Settling Down':'Young families establishing roots','Meandering Millennials':'Early-career professionals exploring options','Faded Blue Collars':'Working-class households with modest assets','Hammer & Nails':'Blue-collar entrepreneurs and tradespeople','Trendy Lofts':'Urban young professionals','Deeply Rooted':'Long-established community households','Adopters & Prosumers':'Tech-savvy early adopters'};
+    let lastListModal = null;
+    function isPerformance() { return document.documentElement.dataset.mode === 'performance'; }
+    function setMode(mode) {
+        document.documentElement.dataset.mode = mode;
+        document.getElementById('mode-perf').classList.toggle('active', mode === 'performance');
+        document.getElementById('mode-express').classList.toggle('active', mode === 'express');
+        document.getElementById('banner-text').textContent = mode === 'performance'
+            ? 'Estate Planning Workshop — Your pre-event intelligence briefing'
+            : 'Estate Planning Workshop — Click anything to explore!';
+        document.querySelectorAll('[data-' + mode + ']').forEach(function(el) {
+            if (el.dataset[mode]) el.textContent = el.dataset[mode];
+        });
+        closeModal(); clearFilters(); renderStarters();
+    }
+    function toggleTheme() {
+        const h = document.documentElement, i = document.getElementById('theme-icon'), t = document.getElementById('theme-text');
+        if (h.dataset.theme === 'dark') { h.dataset.theme = 'light'; i.textContent = '☀️'; t.textContent = 'Light'; }
+        else { h.dataset.theme = 'dark'; i.textContent = '🌙'; t.textContent = 'Dark'; }
+    }
+
+
+    function countHouseholds(pool) {
+        var seen = {};
+        var count = 0;
+        pool.forEach(function(p) {
+            if (p.householdId) {
+                if (!seen[p.householdId]) {
+                    seen[p.householdId] = true;
+                    count++;
+                }
+            } else {
+                count++;
+            }
+        });
+        return count;
+    }
+    function advisorLikelihood(p) {
+        // Derive probability of having an existing advisor from demographic signals
+        let score = 0;
+        // Wealth is strongest signal
+        if (p.wealthTier === 4) score += 35;
+        else if (p.wealthTier === 3) score += 22;
+        else if (p.wealthTier === 2) score += 10;
+        else score += 3;
+        // Investor type
+        if (p.investorTier === 4) score += 25;
+        else if (p.investorTier === 3) score += 15;
+        else if (p.investorTier === 2) score += 5;
+        // Age + wealth combo
+        if (p.age >= 65 && p.wealthTier >= 3) score += 15;
+        else if (p.age >= 55 && p.wealthTier >= 3) score += 10;
+        else if (p.age < 45) score -= 5;
+        // Donor = financial sophistication
+        if (p.donor && p.wealthTier >= 3) score += 10;
+        else if (p.donor) score += 5;
+        // Home value proxy
+        var hv = parseInt((p.homeValue.match(/[\d,]+/)||['0'])[0].replace(/,/g,''));
+        if (hv >= 700) score += 8;
+        else if (hv >= 500) score += 4;
+        // Cap and classify
+        if (score >= 55) return { level: 'High', label: 'Likely Advised', color: 'var(--accent-gold)', tip: 'High probability of existing advisor relationship. Lead with plan review, not discovery.' };
+        if (score >= 30) return { level: 'Moderate', label: 'Possibly Advised', color: 'var(--accent-blue)', tip: 'May have basic advisor relationship. Probe for gaps in current planning.' };
+        return { level: 'Low', label: 'Likely Unadvised', color: 'var(--accent-neon)', tip: 'Strong greenfield prospect. Education-first approach recommended.' };
+    }
+    function calculateScore(p) {
+        const t = weights.worth + weights.income + weights.investor + weights.home;
+        if (!t) return 0;
+        const hvNum = parseInt((p.homeValue.match(/[\d,]+/)||['0'])[0].replace(/,/g,''));
+        const homeScore = hvNum >= 1000 ? 95 : hvNum >= 700 ? 80 : hvNum >= 500 ? 65 : hvNum >= 300 ? 50 : hvNum >= 200 ? 35 : 20;
+        const raw = (p.wealthTier * 25 * weights.worth / t) + (p.incomeTier * 25 * weights.income / t) + (p.investorTier * 25 * weights.investor / t) + (homeScore * weights.home / t);
+        return Math.min(99, Math.round(raw * 1.15));
+    }
+    function animateCounters() {
+        document.querySelectorAll('[data-count]').forEach(el => {
+            const t = parseFloat(el.dataset.count), d = parseInt(el.dataset.decimals) || 0, px = el.dataset.prefix || '', fmt = el.dataset.format, dur = 1200, st = performance.now();
+            function u(now) { const p = Math.min((now - st) / dur, 1), e = 1 - Math.pow(1 - p, 3), c = t * e; el.textContent = fmt === 'currency' ? px + (c / 1e6).toFixed(1) + 'M' : px + c.toFixed(d); if (p < 1) requestAnimationFrame(u); }
+            requestAnimationFrame(u);
+        });
+    }
+    const starterPool = [
+        { id:'s1', test: p => p.age>=60 && p.investorTier>=4, weight:'investor', label: count => `${count} high-conviction investors aged 60+`, tip:'Lead with trust structures, beneficiary planning, and tax-efficient wealth transfer strategies.', priority: 10 },
+        { id:'s2', test: p => p.incomeTier>=4 && p.interests.golf, weight:'income', label: count => `${count} high earners ($200K+) who golf`, tip:'Perfect for a country club follow-up. Discuss estate planning over 18 holes.', priority: 9 },
+        { id:'s3', test: p => parseInt((p.homeValue.match(/[\d,]+/)||['0'])[0].replace(/,/g,''))>=500, weight:'home', label: count => `${count} homeowners with $500K+ home values`, tip:'Discuss property titling, homestead exemptions, and real estate within estate plans.', priority: 7 },
+        { id:'s4', test: p => p.interests.wine, weight:'all', label: count => `${count} registrants into gourmet food & wine`, tip:'Host an intimate wine-tasting follow-up dinner to deepen relationships.', priority: 5 },
+        { id:'s5', test: p => p.wealthTier>=4 && p.donor, weight:'worth', label: count => `${count} high-net-worth charitable donors`, tip:'Open with philanthropic planning — donor-advised funds and charitable remainder trusts.', priority: 9 },
+        { id:'s6', test: p => p.age>=55 && p.age<=64 && p.wealthTier>=3, weight:'worth', label: count => `${count} pre-retirees with $500K+ net worth`, tip:'Prime window for catch-up contributions and Roth conversion strategies.', priority: 8 },
+        { id:'s7', test: p => p.investorTier>=3 && p.interests.travel, weight:'investor', label: count => `${count} active investors who love travel`, tip:'Discuss international diversification and travel reward optimization strategies.', priority: 6 },
+        { id:'s8', test: p => p.children>=2 && p.wealthTier>=3, weight:'worth', label: count => `${count} wealthy families with 2+ children`, tip:'529 plans, family trusts, and multi-generational wealth transfer conversations.', priority: 8 },
+        { id:'s9', test: p => p.investorTier<=1 && p.incomeTier>=3, weight:'income', label: count => `${count} high earners not yet investing`, tip:'Huge opportunity — they have the income but need guidance getting started.', priority: 9 },
+        { id:'s10', test: p => p.age>=65 && p.homeowner && p.homeEquityCode>='M', weight:'home', label: count => `${count} retirees with $200K+ home equity`, tip:'Home equity strategies, downsizing conversations, and income stream planning.', priority: 7 },
+        { id:'s11', test: p => p.married && p.wealthTier>=4, weight:'worth', label: count => `${count} married couples with $1M+ net worth`, tip:'Joint estate planning, survivorship strategies, and beneficiary reviews.', priority: 8 },
+        { id:'s12', test: p => p.interests.golf && p.wealthTier>=3, weight:'all', label: count => `${count} golfers with $500K+ net worth`, tip:'Book a foursome follow-up — relaxed setting for deeper financial conversations.', priority: 6 },
+        { id:'s13', test: p => p.occupation==='Retired' && p.investorTier>=2, weight:'investor', label: count => `${count} retirees open to financial advice`, tip:'Focus on legacy planning, charitable giving strategies, and asset protection for retirees.', priority: 7 },
+        { id:'s14', test: p => p.donorPolitical && p.wealthTier>=3, weight:'worth', label: count => `${count} politically active high-net-worth individuals`, tip:'Tax-efficient giving strategies and political donation optimization.', priority: 5 },
+        { id:'s15', test: p => p.age<45 && p.incomeTier>=3, weight:'income', label: count => `${count} young professionals earning $100K+`, tip:'Long time horizon — irrevocable trusts, life insurance planning, and multigenerational wealth transfer.', priority: 7 }
+    ,
+        { id:'s16', test: p => advisorLikelihood(p).level === 'Low' && p.wealthTier >= 2, weight:'worth', label: count => count + ' prospects likely without an advisor ($250K+ net worth)', tip:'Greenfield opportunities — lead with education, not product. These prospects need a trusted guide, not a sales pitch.', priority: 8 }];
+    function getWeightBoost(starter) {
+        const total = weights.worth + weights.income + weights.investor + weights.home;
+        if (!total) return 1;
+        if (starter.weight === 'worth') return 1 + (weights.worth / total);
+        if (starter.weight === 'income') return 1 + (weights.income / total);
+        if (starter.weight === 'investor') return 1 + (weights.investor / total);
+        if (starter.weight === 'home') return 1 + (weights.home / total);
+        return 1;
+    }
+    function renderStarters() {
+        const pool = activeFilters.length ? getFilteredProspects() : prospects;
+        const perf = isPerformance();
+        const rawScored = starterPool.map(s => {
+            let matches; try { matches = pool.filter(s.test).map(p => ({...p, score: calculateScore(p)})).sort((a,b) => b.score - a.score); } catch(e) { return null; }
+            const count = matches.length;
+            if (count === 0) return null;
+            const boost = getWeightBoost(s);
+            const avgScore = matches.reduce((sum, p) => sum + p.score, 0) / count;
+            return { ...s, count, matches, finalScore: (s.priority * boost) + (avgScore / 10), label: s.label(count) };
+        }).filter(Boolean).sort((a, b) => b.finalScore - a.finalScore);
+        const usedLeads = new Set();
+        const scored = [];
+        for (const s of rawScored) {
+            if (scored.length >= 6) break;
+            const lead = s.matches.find(p => !usedLeads.has(p.id)) || s.matches[0];
+            usedLeads.add(lead.id);
+            scored.push({ ...s, lead });
+        }
+        const grid = document.getElementById('starters-grid');
+        grid.innerHTML = scored.map((s, i) => `
+            <div class="starter-item ${i < 2 ? 'high-value' : ''}" onclick="${perf ? '' : `openStarterModal('${s.id}')`}" style="animation:fadeSlide 0.3s ease ${i * 0.05}s both">
+                <div class="starter-rank">${i + 1}</div>
+                <div class="starter-text"><strong>${s.label}</strong>${isPerformance() ? '' : ' — ' + s.matches.slice(0,3).map(p => p.name.split(' ')[0] + ' ' + p.name.split(' ').pop()).join(', ') + (s.matches.length > 3 ? ' & ' + (s.matches.length - 3) + ' more' : '')}. ${s.tip}</div>
+            </div>
+        `).join('');
+    }
+    function openStarterModal(sid) {
+        if (isPerformance()) return;
+        const pool = activeFilters.length ? getFilteredProspects() : prospects;
+        const s = starterPool.find(x => x.id === sid);
+        if (!s) return;
+        const matches = pool.filter(s.test).map(p => ({ ...p, score: calculateScore(p) })).sort((a, b) => b.score - a.score);
+        const tipHtml = '<div style="background:var(--accent-gold-dim);border:1px solid rgba(201,162,39,0.3);border-radius:8px;padding:10px 16px;margin-bottom:16px;font-size:12px;display:flex;align-items:center;gap:10px"><span>\u{1F4A1}</span><span><strong style="color:var(--accent-gold)">Advisor Tip:</strong> ' + s.tip + '</span></div>';
+        openModal(s.label(matches.length), matches.length + ' registrants', 'starter', matches, tipHtml);
+    }
+    function generatePersonalStarter(p) {
+        const firstName = p.name.split(' ')[0];
+        let parts = [];
+        if (p.wealthTier >= 4 && p.investorTier >= 4) parts.push(`${firstName} is a high-conviction investor with an estimated ${p.wealth} net worth`);
+        else if (p.wealthTier >= 4) parts.push(`${firstName} has significant wealth (${p.wealth} estimated) but isn't actively investing yet`);
+        else if (p.wealthTier >= 3) parts.push(`${firstName} has solid assets in the ${p.wealth} range`);
+        else if (p.incomeTier >= 3) parts.push(`${firstName} earns ${p.income} but is still building wealth`);
+        else parts.push(`${firstName} is early in their financial journey`);
+        if (p.age >= 65) parts.push(`At ${p.age}, estate distribution planning and trust reviews are top priorities`);
+        else if (p.age >= 55) parts.push(`At ${p.age}, this is the prime window for catch-up contributions and Roth conversions`);
+        else if (p.age >= 45) parts.push(`At ${p.age}, estate planning now can protect growing assets and set up the next generation`);
+        else parts.push(`At ${p.age}, compounding is their biggest advantage`);
+        if (p.children >= 2 && p.wealthTier >= 3) parts.push(`With ${p.children} children, multi-generational wealth transfer and 529 plans are natural topics`);
+        else if (p.children >= 1) parts.push(`With ${p.children === 1 ? 'a child' : p.children + ' children'}, education and legacy planning may resonate`);
+        if (p.homeEquityCode >= 'N') parts.push(`Their $300K+ in home equity opens doors for equity-based income strategies`);
+        else if (p.homeEquityCode >= 'K' && p.age >= 60) parts.push(`They've built solid home equity — worth discussing real estate titling and trust considerations`);
+        const hooks = [];
+        if (p.interests.golf) hooks.push('golf');
+        if (p.interests.wine) hooks.push('wine & dining');
+        if (p.interests.travel) hooks.push('travel');
+        if (hooks.length) parts.push(`They enjoy ${hooks.join(' and ')} — great for a relaxed follow-up setting`);
+        if (p.donor && p.wealthTier >= 3) parts.push(`As a known charitable donor, bring up donor-advised funds or charitable remainder trusts`);
+        if (p.investorTier <= 1 && p.incomeTier >= 3) parts.push(`Big opportunity here — the income is there but they need a push to start investing`);
+        else if (p.investorTier >= 4) parts.push(`Come prepared — they know their stuff and will expect sophisticated strategies`);
+        else if (p.investorTier >= 3) parts.push(`They're already engaged — focus on optimizing what they have`);
+        return parts.join('. ') + '.';
+    }
+    function heroClick(type) { if (!isPerformance()) { if (type === 'all') { openModal('All Registrants', prospects.length + ' matched + ' + currentUnmatched.length + ' unmatched', type, null, null, currentUnmatched); } else { openModal(heroMeta[type].t, heroMeta[type].s, type); } } }
+    function qsClick(type) { if (!isPerformance()) openModal(qsMeta[type].t, qsMeta[type].s, type); }
+    const heroMeta = {
+        all: {t:'All Registrants',s:'All registrants'}, assets: {t:'Est. Wealth in Room',s:'Based on 33 matched records'},
+        scores: {t:'Match Scores',s:'Composite scoring across all data'}, drive: {t:'Drive Time',s:'Distance from venue'},
+        tier1: {t:'Top Targets',s:'5 high-priority prospects'}
+    };
+    const qsMeta = {
+        avgage: {t:'Average Age',s:'Age distribution'}, married: {t:'Married',s:'28 of 33 matched'},
+        children: {t:'Have Children',s:'29 of 33 matched have kids'}, homeowners: {t:'Homeowners',s:'31 of 33 matched own homes'},
+        donors: {t:'Charitable Donors',s:'Known charitable donors'}, investors: {t:'Active Investors',s:'High-conviction + Active'},
+        hnw: {t:'Net Worth $1M+',s:'6 registrants with $1M+ estimated net worth'}, matchrate: {t:'Data Match Rate',s:'33 of 47 matched'}
+    };
+    function segClick(l, t, el) { if (isPerformance()) return; toggleFilter(l, t, el); }
+    function toggleFilter(l, t, el) {
+        const i = activeFilters.findIndex(f => f.label === l && f.type === t);
+        if (i >= 0) { activeFilters.splice(i, 1); el.classList.remove('active'); }
+        else { activeFilters.push({ label: l, type: t }); el.classList.add('active'); }
+        renderFilters(); renderStarters();
+    }
+    function removeFilter(l, t) { activeFilters = activeFilters.filter(f => !(f.label === l && f.type === t)); document.querySelectorAll('.segment-item.active').forEach(el => { if (el.querySelector('.segment-item-label').textContent.includes(l)) el.classList.remove('active'); }); renderFilters(); renderStarters(); }
+    function clearFilters() { activeFilters = []; document.querySelectorAll('.segment-item.active').forEach(el => el.classList.remove('active')); renderFilters(); renderStarters(); }
+    function renderFilters() {
+        const c = document.getElementById('active-filters'), r = document.getElementById('filter-results'), b = document.getElementById('clear-btn'), s = document.getElementById('results-btn');
+        if (!activeFilters.length) { c.innerHTML = ''; r.innerHTML = ''; b.style.display = 'none'; s.style.display = 'none'; updateSegmentDimming(); }
+        else { updateSegmentDimming(); c.innerHTML = activeFilters.map(f => `<div class="filter-tag" onclick="removeFilter('${f.label}','${f.type}')">${f.label} <span class="remove">×</span></div>`).join(''); r.innerHTML = `Showing <strong>${getFilteredProspects().length}</strong> registrants`; b.style.display = 'block'; s.style.display = 'block'; }
+    }
+    function openFilteredModal() {
+        if (isPerformance()) return;
+        const f = getFilteredProspects();
+        if (activeFilters.length === 1) openModal(activeFilters[0].label, `${f.length} registrants`, 'filter', f);
+        else openModal(`Cross-Filter: ${activeFilters.map(f => f.label).join(' + ')}`, `${f.length} registrants match ALL criteria`, 'venn', f);
+    }
+    function getFilteredProspects() {
+        if (!activeFilters.length) return prospects;
+        return prospects.filter(p => activeFilters.every(f => {
+            if (f.type === 'wealth') return f.label === '$1M+' ? p.wealthTier === 4 : f.label === '$500K-$1M' ? p.wealthTier === 3 : f.label === '$250K-$500K' ? p.wealthTier === 2 : p.wealthTier === 1;
+            if (f.type === 'income') return f.label === '$200K+' ? p.incomeTier === 4 : f.label === '$100K-$200K' ? p.incomeTier === 3 : f.label === '$50K-$100K' ? p.incomeTier === 2 : p.incomeTier === 1;
+            if (f.type === 'homeVal') { const hv = parseInt((p.homeValue.match(/[\d,]+/)||['0'])[0].replace(/,/g,'')); return f.label === '$500K+ Home' ? hv >= 500 : f.label === '$300K-$500K Home' ? hv >= 300 && hv < 500 : f.label === '$150K-$300K Home' ? hv >= 150 && hv < 300 : hv < 150; }
+            if (f.type === 'investor') return f.label === 'High-Conviction' ? p.investorTier === 4 : f.label === 'Active Investor' ? p.investorTier === 3 : f.label === 'Open to Advice' ? p.investorTier === 2 : p.investorTier === 1;
+            if (f.type === 'age') return f.label === '60+' ? p.age >= 60 : f.label === '50-59' ? p.age >= 50 && p.age < 60 : f.label === '40-49' ? p.age >= 40 && p.age < 50 : p.age < 40;
+            if (f.type === 'persona') return f.label === 'Other Profiles' ? !['Crème de la Crème','Country Club Conservatives','Portfolios & Passports','Actively Retired'].includes(p.persona) : p.persona === f.label;
+            if (f.type === 'occupation') return f.label === 'Business Owner' ? p.title.includes('Business Owner') : p.occupation === f.label;
+            if (f.type === 'lifestyle') return f.label === 'Investments & Finance' ? p.interests.finance : f.label === 'Golf' ? p.interests.golf : f.label === 'Travel' ? p.interests.travel : p.interests.wine;
+            if (f.type === 'advisor') return advisorLikelihood(p).label === f.label;
+        return true;
+        }));
+    }
+    function openModal(title, subtitle, type, customData = null, tipHtml = null, showUnmatched = null) {
+        lastListModal = { title, subtitle, type, data: customData };
+        document.getElementById('modal-title').textContent = title;
+        document.getElementById('modal-subtitle').textContent = subtitle;
+        const icons = { all:'👥', assets:'💰', scores:'⭐', drive:'🚗', tier1:'⭐', venn:'🔍', filter:'📋', starter:'💬', children:'👶', email:'📧', avgage:'🎂', homeowners:'🏠', married:'💍', matchrate:'📊', investors:'📈', hnw:'💎', donors:'🤝' };
+        document.getElementById('modal-icon').textContent = icons[type] || '📊';
+        let data = customData || getDataForType(type), body = '';
+        if (type === 'venn' && activeFilters.length >= 2) body = `<div class="venn-preview"><div class="venn-title">Registrants matching: ${activeFilters.map(f => f.label).join(' AND ')}</div><div class="venn-result">${data.length}</div><div class="venn-desc">Your cross-filter overlap</div></div>`;
+        body += generateTable(data, tipHtml, showUnmatched);
+        document.getElementById('modal-body').innerHTML = body;
+        document.getElementById('modal').classList.add('active');
+    }
+    function getDataForType(type) {
+        const s = prospects.map(p => ({ ...p, score: calculateScore(p) })).sort((a, b) => b.score - a.score);
+        switch (type) {
+            case 'all': return s.map(function(p) { p._matched = true; return p; }); case 'assets': return s.filter(p => p.wealthTier >= 3);
+            case 'tier1': return s.slice(0, 5); case 'email': return s.filter(p => p.email);
+            case 'children': return s.filter(p => p.children > 0); case 'homeowners': return s.filter(p => p.homeowner);
+            case 'married': return s.filter(p => p.married); case 'investors': return s.filter(p => p.investorTier >= 3);
+            case 'hnw': return s.filter(p => p.wealthTier === 4); case 'donors': return s.filter(p => p.donor);
+            default: return s;
+        }
+    }
+    function generateTable(data, tipHtml, showUnmatched) {
+        if (!data || !data.length) return '<p style="color:var(--text-muted);text-align:center;padding:20px">No matching registrants</p>';
+        window._tableData = data.map(p => ({...p, score: p.score || calculateScore(p)}));
+        window._tableTip = tipHtml || '';
+        window._showUnmatched = showUnmatched || null;
+        window._sortCol = null;
+        return renderTableHtml(window._tableData, window._tableTip);
+    }
+    function renderTableHtml(data, tipHtml) {
+        var arrow = function(col) { return window._sortCol === col ? (window._sortAsc ? ' ▲' : ' ▼') : ''; };
+        var hdr = '<table class="modal-table"><thead><tr>';
+        var cols = [['name','Name'],['age','Age'],['title','Title'],['wealth','Est. Net Worth'],['income','Income'],['investor','Investor Type'],['score','Score'],['advisor','Advisor Status']];
+        cols.forEach(function(c) {
+            hdr += '<th style="cursor:pointer;user-select:none" onclick="sortTable(&quot;' + c[0] + '&quot;)">' + c[1] + arrow(c[0]) + '</th>';
+        });
+        hdr += '</tr></thead><tbody>';
+        var rows = data.map(function(p) {
+            var wBadge = p.wealthTier >= 4 ? '' : p.wealthTier >= 3 ? 'gold' : 'blue';
+            var iBadge = p.investorTier >= 4 ? '' : p.investorTier >= 3 ? 'gold' : p.investorTier >= 2 ? 'blue' : 'purple';
+            return '<tr onclick="openPersonModal(' + p.id + ')"><td class="table-name">' + p.name + '</td><td>' + p.age + '</td><td>' + p.title + '</td><td><span class="table-badge ' + wBadge + '">' + p.wealth + '</span></td><td>' + p.income + '</td><td><span class="table-badge ' + iBadge + '">' + p.investorType + '</span></td><td>' + p.score + '</td><td><span class="table-badge" style="background:' + (advisorLikelihood(p).level === 'High' ? 'var(--accent-gold-dim);color:var(--accent-gold)' : advisorLikelihood(p).level === 'Moderate' ? 'rgba(59,130,246,0.15);color:var(--accent-blue)' : 'var(--accent-neon-dim);color:var(--accent-neon)') + '">' + advisorLikelihood(p).label + '</span></td></tr>';
+        }).join('');
+        var unmatchedRows = '';
+        if (window._showUnmatched && window._showUnmatched.length) {
+            unmatchedRows = '<tr><td colspan="7" style="padding:12px;font-size:11px;color:var(--text-muted);background:var(--bg-card-alt);text-align:center;font-weight:600">— ' + window._showUnmatched.length + ' Unmatched Registrants (no consumer data) —</td></tr>';
+            window._showUnmatched.forEach(function(u) {
+                unmatchedRows += '<tr style="opacity:0.4"><td class="table-name">' + u.name + '</td><td colspan="6" style="color:var(--text-muted);font-style:italic">No data available</td></tr>';
+            });
+        }
+        return (tipHtml || '') + hdr + rows + unmatchedRows + '</tbody></table>';
+    }
+    function sortTable(col) {
+        if (window._sortCol === col) { window._sortAsc = !window._sortAsc; }
+        else { window._sortCol = col; window._sortAsc = (col === 'name' || col === 'title'); }
+        window._tableData.sort(function(a, b) {
+            var va, vb;
+            if (col === 'name' || col === 'title') { va = a[col]; vb = b[col]; }
+            else if (col === 'age' || col === 'score') { va = a[col]; vb = b[col]; }
+            else if (col === 'wealth') { va = a.wealthTier; vb = b.wealthTier; }
+            else if (col === 'income') { va = a.incomeTier; vb = b.incomeTier; }
+            else if (col === 'investor') { va = a.investorTier; vb = b.investorTier; }
+            else { va = a[col]; vb = b[col]; }
+            if (typeof va === 'string') return window._sortAsc ? va.localeCompare(vb) : vb.localeCompare(va);
+            return window._sortAsc ? va - vb : vb - va;
+        });
+        document.getElementById('modal-body').innerHTML = renderTableHtml(window._tableData, window._tableTip);
+    }
+    function openPersonModal(id) {
+        if (isPerformance()) return;
+        const p = prospects.find(x => x.id === id);
+        if (!p) return;
+        document.getElementById('modal-title').textContent = p.name;
+        document.getElementById('modal-subtitle').textContent = `${p.company ? p.title + " at " + p.company : p.title}`;
+        document.getElementById('modal-icon').textContent = '👤';
+        const starter = generatePersonalStarter(p);
+        const printBtn = '<div style="float:right"><button class="print-person-btn" onclick="event.stopPropagation();printPersonCard()">🖨️ Print Card</button></div>';
+        const backHtml = lastListModal ? '<div style="margin-bottom:12px"><a href="#" onclick="event.preventDefault();openModal(lastListModal.title,lastListModal.subtitle,lastListModal.type,lastListModal.data)" style="color:var(--accent-neon);font-size:12px;text-decoration:none">← Back to list</a></div>' : '';
+        const contactHtml = `<div class="person-section"><div class="person-section-title">Contact Information</div><div class="person-field"><span class="person-field-label">Phone</span><span class="person-field-value">${p.phone || '—'}</span></div><div class="person-field"><span class="person-field-label">Email</span><span class="person-field-value" style="font-size:11px">${p.email || '—'}</span></div><div class="person-field"><span class="person-field-label">Address</span><span class="person-field-value" style="font-size:11px">${p.address ? p.address + '<br>' + p.city : p.city}</span></div></div>`;
+        document.getElementById('modal-body').innerHTML = `${printBtn}${backHtml}<div style="background:linear-gradient(135deg,var(--accent-neon-dim),var(--accent-gold-dim));border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:16px"><div style="font-size:10px;text-transform:uppercase;letter-spacing:0.05em;color:var(--accent-neon);font-weight:600;margin-bottom:6px">💬 Your Conversation Starter</div><div style="font-size:13px;color:var(--text-primary);line-height:1.5">${starter}</div></div>${(function(){
+        var hh = p.householdId ? prospects.filter(function(x){ return x.householdId === p.householdId && x.id !== p.id; }) : [];
+        if (!hh.length) return '';
+        return '<div style="background:var(--accent-gold-dim);border:1px solid rgba(201,162,39,0.3);border-radius:8px;padding:10px 14px;margin-bottom:12px;display:flex;align-items:center;gap:10px"><span style="font-size:14px">👫</span><div><div style="font-size:10px;text-transform:uppercase;letter-spacing:0.05em;color:var(--accent-gold);font-weight:600;margin-bottom:2px">Also Attending (Same Household)</div>' + hh.map(function(s){ return '<span onclick="openPersonModal(' + s.id + ')" style="color:var(--text-primary);cursor:pointer;font-size:13px;font-weight:600;text-decoration:underline;text-decoration-color:var(--accent-gold)">' + s.name + '</span><span style="font-size:11px;color:var(--text-secondary)"> — ' + s.title + '</span>'; }).join('<br>') + '</div></div>';
+    })()}<div class="person-detail">${contactHtml}<div class="person-section"><div class="person-section-title">About</div><div class="person-field"><span class="person-field-label">Age</span><span class="person-field-value">${p.age} years old</span></div><div class="person-field"><span class="person-field-label">Married</span><span class="person-field-value">${p.married ? 'Yes' : 'No'}</span></div><div class="person-field"><span class="person-field-label">Children</span><span class="person-field-value">${p.children}</span></div><div class="person-field"><span class="person-field-label">Homeowner</span><span class="person-field-value">${p.homeowner ? 'Yes' : 'No'}</span></div></div><div class="person-section"><div class="person-section-title">Wealth & Income</div><div class="person-field"><span class="person-field-label">Est. Net Worth</span><span class="person-field-value" style="color:var(--accent-neon)">${p.wealth}</span></div><div class="person-field"><span class="person-field-label">Household Income</span><span class="person-field-value">${p.income}</span></div><div class="person-field"><span class="person-field-label">Investor Type</span><span class="person-field-value">${p.investorType}</span></div><div class="person-field"><span class="person-field-label">Consumer Profile</span><span class="person-field-value" title="${personaDescriptions[p.persona]||''}">${p.persona} <span style="font-size:9px;color:var(--text-muted);cursor:help" title="${personaDescriptions[p.persona]||''}">ⓘ</span></span></div></div><div class="person-section"><div class="person-section-title">Property</div><div class="person-field"><span class="person-field-label">Home Value</span><span class="person-field-value">${p.homeValue}</span></div><div class="person-field"><span class="person-field-label">Occupation</span><span class="person-field-value">${p.occupation}</span></div><div class="person-field"><span class="person-field-label">Prospect Score</span><span class="person-field-value" style="color:var(--accent-neon);font-size:16px">${calculateScore(p)}</span></div><div class="person-field"><span class="person-field-label">Advisor Status</span><span class="person-field-value" style="color:${advisorLikelihood(p).color};font-weight:700;font-size:11px" title="${advisorLikelihood(p).tip}">${advisorLikelihood(p).label} <span style="font-size:9px;color:var(--text-muted);cursor:help" title="${advisorLikelihood(p).tip}">ⓘ</span></span></div></div><div class="person-section"><div class="person-section-title">Behavioral Insights</div><div class="person-field"><span class="person-field-label">Charitable Donor</span><span class="person-field-value">${p.donor ? '✅ Yes' : '—'}</span></div></div><div class="person-section full-width"><div class="person-section-title">Lifestyle Interests</div><div class="lifestyle-tags">${[p.interests.finance ? '<span class="lifestyle-tag investor">Investments & Finance</span>' : '', p.interests.golf ? '<span class="lifestyle-tag">Golf</span>' : '', p.interests.travel ? '<span class="lifestyle-tag">Travel</span>' : '', p.interests.wine ? '<span class="lifestyle-tag">Gourmet Food & Wine</span>' : ''].filter(Boolean).join('')}</div></div>${renderSimilarProfiles(p)}`;
+        document.getElementById('modal').classList.add('active');
+    }
+
+    function updateSegmentDimming() {
+        if (!activeFilters.length) {
+            document.querySelectorAll('.segment-item.dimmed').forEach(el => el.classList.remove('dimmed'));
+            return;
+        }
+        const filtered = getFilteredProspects();
+        document.querySelectorAll('.segment-item').forEach(el => {
+            if (el.classList.contains('active')) return; // don't dim active selections
+            const label = el.querySelector('.segment-item-label').textContent;
+            const onclick = el.getAttribute('onclick') || '';
+            // Extract the filter type and label from the onclick
+            const match = onclick.match(/segClick\('([^']+)','([^']+)'/);
+            if (!match) return;
+            const [, fLabel, fType] = match;
+            // Temporarily add this as a filter and check overlap
+            const testFilters = [...activeFilters, { label: fLabel, type: fType }];
+            const overlap = prospects.filter(p => testFilters.every(f => matchesFilter(p, f)));
+            if (overlap.length === 0) {
+                el.classList.add('dimmed');
+            } else {
+                el.classList.remove('dimmed');
+            }
+        });
+    }
+    function matchesFilter(p, f) {
+        if (f.type === 'wealth') return f.label === '$1M+' ? p.wealthTier === 4 : f.label === '$500K-$1M' ? p.wealthTier === 3 : f.label === '$250K-$500K' ? p.wealthTier === 2 : p.wealthTier === 1;
+        if (f.type === 'income') return f.label === '$200K+' ? p.incomeTier === 4 : f.label === '$100K-$200K' ? p.incomeTier === 3 : f.label === '$50K-$100K' ? p.incomeTier === 2 : p.incomeTier === 1;
+        if (f.type === 'homeVal') { const hv = parseInt((p.homeValue.match(/[\d,]+/)||['0'])[0].replace(/,/g,'')); return f.label === '$500K+ Home' ? hv >= 500 : f.label === '$300K-$500K Home' ? hv >= 300 && hv < 500 : f.label === '$150K-$300K Home' ? hv >= 150 && hv < 300 : hv < 150; }
+        if (f.type === 'investor') return f.label === 'High-Conviction' ? p.investorTier === 4 : f.label === 'Active Investor' ? p.investorTier === 3 : f.label === 'Open to Advice' ? p.investorTier === 2 : p.investorTier === 1;
+        if (f.type === 'age') return f.label === '60+' ? p.age >= 60 : f.label === '50-59' ? p.age >= 50 && p.age < 60 : f.label === '40-49' ? p.age >= 40 && p.age < 50 : p.age < 40;
+        if (f.type === 'persona') return f.label === 'Other Profiles' ? !['Crème de la Crème','Country Club Conservatives','Portfolios & Passports','Actively Retired'].includes(p.persona) : p.persona === f.label;
+        if (f.type === 'occupation') return f.label === 'Business Owner' ? p.title.includes('Business Owner') : p.occupation === f.label;
+        if (f.type === 'lifestyle') return f.label === 'Investments & Finance' ? p.interests.finance : f.label === 'Golf' ? p.interests.golf : f.label === 'Travel' ? p.interests.travel : p.interests.wine;
+        if (f.type === 'advisor') return advisorLikelihood(p).label === f.label;
+        if (f.type === 'advisor') return advisorLikelihood(p).label === f.label;
+        return true;
+    }
+
+    function renderQuickStats() {
+        const pool = prospects, n = pool.length;
+        const avgAge = Math.round(pool.reduce((s,p) => s + p.age, 0) / n);
+        const married = pool.filter(p => p.married).length, marriedPct = Math.round(married / n * 100);
+        const kids = pool.filter(p => p.children > 0).length, kidsPct = Math.round(kids / n * 100);
+        const homeowners = pool.filter(p => p.homeowner).length, homeownersPct = Math.round(homeowners / n * 100);
+        const donors = pool.filter(p => p.donor).length;
+        const investors = pool.filter(p => p.investorTier >= 3).length;
+        const hnw = pool.filter(p => p.wealthTier === 4).length;
+        const qs = document.getElementById('quick-stats');
+        qs.innerHTML = `
+            <div class="quick-stat" onclick="qsClick('avgage')"><div class="quick-stat-icon">🎂</div><div class="quick-stat-value">${avgAge}</div><div class="quick-stat-label">Avg Age</div></div>
+            <div class="quick-stat" onclick="qsClick('married')"><div class="quick-stat-icon">💍</div><div class="quick-stat-value">${marriedPct}%</div><div class="quick-stat-label">Married</div></div>
+            <div class="quick-stat" onclick="qsClick('children')"><div class="quick-stat-icon">👶</div><div class="quick-stat-value">${kidsPct}%</div><div class="quick-stat-label">Have Children</div></div>
+            <div class="quick-stat" onclick="qsClick('homeowners')"><div class="quick-stat-icon">🏠</div><div class="quick-stat-value">${homeownersPct}%</div><div class="quick-stat-label">Homeowners</div></div>
+            <div class="quick-stat" onclick="qsClick('donors')"><div class="quick-stat-icon">🤝</div><div class="quick-stat-value">${donors}</div><div class="quick-stat-label">Donors</div></div>
+            <div class="quick-stat" onclick="qsClick('investors')"><div class="quick-stat-icon">📈</div><div class="quick-stat-value">${investors}</div><div class="quick-stat-label">Active Investors</div></div>
+            <div class="quick-stat" onclick="qsClick('hnw')"><div class="quick-stat-icon">💎</div><div class="quick-stat-value">${hnw}</div><div class="quick-stat-label">Net Worth $1M+</div></div>
+            
+        `;
+    }
+
+    function renderSimilarProfiles(p) {
+        var similar = prospects
+            .filter(function(x) { return x.persona === p.persona && x.id !== p.id; })
+            .map(function(x) { var copy = Object.assign({}, x); copy.score = calculateScore(x); return copy; })
+            .sort(function(a, b) { return b.score - a.score; });
+        var desc = personaDescriptions[p.persona] || '';
+        if (!similar.length) {
+            return '<div class="person-section full-width"><div class="person-section-title">Similar Profiles</div><div style="font-size:12px;color:var(--text-muted);padding:8px">No other registrants in this segment</div></div>';
+        }
+        var rows = '';
+        for (var i = 0; i < similar.length; i++) {
+            var x = similar[i];
+            rows += '<div onclick="openPersonModal(' + x.id + ')" style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;border-radius:6px;background:var(--bg-card);cursor:pointer;transition:all 0.2s;border:1px solid var(--border);margin-bottom:2px">';
+            rows += '<div><span style="font-weight:600;font-size:12px">' + x.name + '</span>';
+            rows += '<span style="color:var(--text-muted);font-size:11px;margin-left:8px">' + x.title + '</span></div>';
+            rows += '<div style="display:flex;align-items:center;gap:8px">';
+            rows += '<span style="font-size:11px;color:var(--text-secondary)">' + x.wealth + '</span>';
+            rows += '<span style="background:var(--accent-neon-dim);color:var(--accent-neon);padding:2px 8px;border-radius:10px;font-size:10px;font-weight:600">' + x.score + '</span>';
+            rows += '</div></div>';
+        }
+        return '<div class="person-section full-width"><div class="person-section-title">\ud83d\udc65 Similar Profiles \u00b7 ' + p.persona + '</div>'
+            + '<div style="font-size:10px;color:var(--text-muted);margin-bottom:10px">' + desc + '</div>'
+            + '<div style="display:flex;flex-direction:column;gap:4px">' + rows + '</div></div>';
+    }
+
+
+    function printPersonCard() {
+        var modalBody = document.getElementById('modal-body');
+        var title = document.getElementById('modal-title').textContent;
+        var subtitle = document.getElementById('modal-subtitle').textContent;
+        var printWin = window.open('', '_blank', 'width=800,height=900');
+        printWin.document.write('<html><head><title>' + title + '</title>');
+        printWin.document.write('<style>');
+        printWin.document.write('* { margin: 0; padding: 0; box-sizing: border-box; }');
+        printWin.document.write('body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; padding: 24px; color: #1a1a1a; font-size: 12px; }');
+        printWin.document.write('h1 { font-size: 22px; margin-bottom: 2px; }');
+        printWin.document.write('h2 { font-size: 13px; color: #666; font-weight: 400; margin-bottom: 16px; }');
+        printWin.document.write('.card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }');
+        printWin.document.write('.section { background: #f8f9fa; border-radius: 8px; padding: 12px; break-inside: avoid; }');
+        printWin.document.write('.section.full { grid-column: 1 / -1; }');
+        printWin.document.write('.section-title { font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em; color: #888; margin-bottom: 8px; font-weight: 600; }');
+        printWin.document.write('.field { display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px solid #eee; }');
+        printWin.document.write('.field:last-child { border-bottom: none; }');
+        printWin.document.write('.field-label { color: #888; }');
+        printWin.document.write('.field-value { font-weight: 600; text-align: right; }');
+        printWin.document.write('.starter-box { background: #e8f5f3; border: 1px solid #b2dfdb; border-radius: 8px; padding: 12px; margin-bottom: 16px; }');
+        printWin.document.write('.starter-label { font-size: 10px; text-transform: uppercase; color: #00897b; font-weight: 600; margin-bottom: 4px; }');
+        printWin.document.write('.tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }');
+        printWin.document.write('.tag { background: #e0e0e0; padding: 2px 8px; border-radius: 10px; font-size: 10px; }');
+        printWin.document.write('.footer { margin-top: 16px; padding-top: 8px; border-top: 1px solid #ddd; font-size: 10px; color: #aaa; text-align: center; }');
+        printWin.document.write('.print-btn { display: block; margin: 16px auto; padding: 8px 24px; background: #00897b; color: white; border: none; border-radius: 6px; font-size: 13px; cursor: pointer; }');
+        printWin.document.write('@media print { .print-btn { display: none; } }');
+        printWin.document.write('</style></head><body>');
+        printWin.document.write('<h1>' + title + '</h1>');
+        printWin.document.write('<h2>' + subtitle + '</h2>');
+        // Clone the modal content, stripping interactive elements
+        var clone = modalBody.cloneNode(true);
+        // Remove print button itself, back link, and similar profiles from printout
+        clone.querySelectorAll('.print-person-btn, .similar-row').forEach(function(el) { el.remove(); });
+        // Get the HTML and clean it up for print
+        var content = clone.innerHTML;
+        // Strip inline dark-mode colors for print
+        content = content.replace(/var\(--accent-neon-dim\)/g, '#e8f5f3');
+        content = content.replace(/var\(--accent-gold-dim\)/g, '#fff8e1');
+        content = content.replace(/var\(--accent-neon\)/g, '#00897b');
+        content = content.replace(/var\(--accent-gold\)/g, '#f57f17');
+        content = content.replace(/var\(--bg-card-alt\)/g, '#f8f9fa');
+        content = content.replace(/var\(--bg-card\)/g, '#f0f0f0');
+        content = content.replace(/var\(--text-primary\)/g, '#1a1a1a');
+        content = content.replace(/var\(--text-secondary\)/g, '#555');
+        content = content.replace(/var\(--text-muted\)/g, '#888');
+        content = content.replace(/var\(--border\)/g, '#e0e0e0');
+        content = content.replace(/var\(--bg-modal\)/g, '#fff');
+        printWin.document.write(content);
+        printWin.document.write('<div class="footer">Pre-Event Registrant Card · AcquireUp · Confidential</div>');
+        printWin.document.write('<button class="print-btn" onclick="window.print()">🖨️ Print This Card</button>');
+        printWin.document.write('</body></html>');
+        printWin.document.close();
+    }
+    function closeModal() { document.getElementById('modal').classList.remove('active'); }
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+    document.addEventListener('DOMContentLoaded', () => { animateCounters(); renderStarters();
+    updateSegmentCounts(); renderQuickStats(); });
+    </script>
+</body>
+</html>
