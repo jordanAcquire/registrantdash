@@ -616,7 +616,7 @@ const eveningUnmatched = [
     const heroMeta = {
         all: {t:'All Registrants',s:'All registrants'}, assets: {t:'Est. Wealth in Room',s:'Based on 33 matched records'},
         scores: {t:'Match Scores',s:'Composite scoring across all data'}, drive: {t:'Drive Time',s:'Distance from venue'},
-        tier1: {t:'Top Targets',s:'5 high-priority prospects'}
+        tier1: {t:'Top Targets',s:'Priority prospects by wealth & investor status'}
     };
     const qsMeta = {
         avgage: {t:'Average Age',s:'Age distribution'}, married: {t:'Married',s:'28 of 33 matched'},
@@ -675,7 +675,7 @@ const eveningUnmatched = [
         const s = prospects.map(p => ({ ...p, score: calculateScore(p) })).sort((a, b) => b.score - a.score);
         switch (type) {
             case 'all': return s.map(function(p) { p._matched = true; return p; }); case 'assets': return s.filter(p => p.wealthTier >= 3);
-            case 'tier1': return s.slice(0, 5); case 'email': return s.filter(p => p.email);
+            case 'tier1': return s.filter(p => p.wealthTier >= 3 || p.investorTier >= 4); case 'email': return s.filter(p => p.email);
             case 'children': return s.filter(p => p.children > 0); case 'homeowners': return s.filter(p => p.homeowner);
             case 'married': return s.filter(p => p.married); case 'investors': return s.filter(p => p.investorTier >= 3);
             case 'hnw': return s.filter(p => p.wealthTier === 4); case 'donors': return s.filter(p => p.donor);
