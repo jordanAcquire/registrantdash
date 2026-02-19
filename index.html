@@ -207,11 +207,11 @@
             </div>
         </header>
         <div class="hero-stats">
-            <div class="hero-stat" onclick="heroClick('all')" title="33 matched + 14 unmatched"><div class="stat-label">Total Registrants</div><div class="stat-value" data-count="38">0</div><div class="stat-sub" data-express="28 matched · 25 households · 10 unmatched" data-performance="25 households">28 matched · 25 households · 10 unmatched</div><div class="stat-hover-hint">Click to view all →</div></div>
-            <div class="hero-stat featured" onclick="heroClick('assets')"><div class="stat-label">Est. Wealth in Room</div><div class="stat-value money" data-count="16250000" data-prefix="$" data-format="currency">$0</div><div class="stat-sub" data-express="Based on 28 of 38 registrants (25 households)" data-performance="Estimated from registrant data">Based on 28 of 38 registrants (25 households)</div><div class="stat-hover-hint">Click for breakdown →</div></div>
-            <div class="hero-stat" onclick="heroClick('scores')"><div class="stat-label">Avg Match Score</div><div class="stat-value"><span data-count="8.4" data-decimals="1">0</span><span style="font-size:14px;font-weight:400;color:var(--text-muted)"> / 10</span></div><div class="stat-sub" data-express="28 matched · 25 households" data-performance="Composite quality indicator">28 matched · 25 households</div><div class="stat-hover-hint">Click for details →</div></div>
-            <div class="hero-stat" onclick="heroClick('drive')"><div class="stat-label">Avg Drive Time</div><div class="stat-value"><span data-count="14">0</span><span style="font-size:14px;font-weight:400"> min</span></div><div class="stat-sub">Within 15 mi radius</div><div class="stat-hover-hint">Click for map data →</div></div>
-            <div class="hero-stat top-targets-card" onclick="heroClick('tier1')"><div class="stat-label">Top Targets</div><div class="stat-value" style="color:var(--accent-gold)" data-count="13">0</div><div class="stat-sub">★ Priority prospects</div><div class="stat-hover-hint">Click to see who →</div></div>
+            <div class="hero-stat" onclick="heroClick('all')" title="Click to view all registrants"><div class="stat-label">Total Registrants</div><div class="stat-value" data-count="0">0</div><div class="stat-sub" data-express="28 matched · 25 households · 10 unmatched" data-performance="25 households">28 matched · 25 households · 10 unmatched</div><div class="stat-hover-hint">Click to view all →</div></div>
+            <div class="hero-stat featured" onclick="heroClick('assets')"><div class="stat-label">Est. Wealth in Room</div><div class="stat-value money" data-count="0" data-prefix="$" data-format="currency">$0</div><div class="stat-sub" data-express="Based on 28 of 38 registrants (25 households)" data-performance="Estimated from registrant data">Based on 28 of 38 registrants (25 households)</div><div class="stat-hover-hint">Click for breakdown →</div></div>
+            <div class="hero-stat" onclick="heroClick('scores')"><div class="stat-label">Avg Match Score</div><div class="stat-value"><span data-count="0" data-decimals="1">0</span><span style="font-size:14px;font-weight:400;color:var(--text-muted)"> / 10</span></div><div class="stat-sub" data-express="28 matched · 25 households" data-performance="Composite quality indicator">28 matched · 25 households</div><div class="stat-hover-hint">Click for details →</div></div>
+            <div class="hero-stat" onclick="heroClick('drive')"><div class="stat-label">Avg Drive Time</div><div class="stat-value"><span data-count="0">0</span><span style="font-size:14px;font-weight:400"> min</span></div><div class="stat-sub">Within 15 mi radius</div><div class="stat-hover-hint">Click for map data →</div></div>
+            <div class="hero-stat top-targets-card" onclick="heroClick('tier1')"><div class="stat-label">Top Targets</div><div class="stat-value" style="color:var(--accent-gold)" data-count="0">0</div><div class="stat-sub">★ Priority prospects</div><div class="stat-hover-hint">Click to see who →</div></div>
         </div>
         <div class="quick-stats" id="quick-stats"></div>
         <div class="starters-card">
@@ -334,6 +334,10 @@ const eveningUnmatched = [
         // Phase 4: swap prospect data and recalculate everything
         swapEventData(date);
     }
+    // ═══════════════════════════════════════════════════════════════
+    // DATE TOGGLE — Swaps entire dataset and recalculates all UI:
+    //   hero stats, segment counts, starters, quick stats, coverage banner
+    // ═══════════════════════════════════════════════════════════════
     function swapEventData(date) {
         // Swap prospect data
         prospects = date === 'morning' ? morningProspects : eveningProspects;
@@ -456,13 +460,11 @@ const eveningUnmatched = [
         });
         closeModal(); clearFilters(); renderStarters();
     }
-    function toggleTheme() {
-        const h = document.documentElement, i = document.getElementById('theme-icon'), t = document.getElementById('theme-text');
-        if (h.dataset.theme === 'dark') { h.dataset.theme = 'light'; i.textContent = '☀️'; t.textContent = 'Light'; }
-        else { h.dataset.theme = 'dark'; i.textContent = '🌙'; t.textContent = 'Dark'; }
-    }
 
 
+
+    // Household deduplication — prospects sharing a householdId
+    // count as one household. Unlinked prospects count individually.
     function countHouseholds(pool) {
         var seen = {};
         var count = 0;
@@ -478,6 +480,25 @@ const eveningUnmatched = [
         });
         return count;
     }
+    // ═══════════════════════════════════════════════════════════════
+    // ADVISOR STATUS — Derived indicator estimating whether a prospect
+    // already has a financial advisor relationship.
+    //
+    // Scoring weights (max ~93 points):
+    //   Wealth tier:        up to 35 pts  (strongest signal)
+    //   Investor type:      up to 25 pts  (engagement level)
+    //   Age + wealth combo: up to 15 pts  (older + wealthier = more likely advised)
+    //   Donor status:       up to 10 pts  (financial sophistication proxy)
+    //   Home value:         up to  8 pts  (complexity proxy)
+    //
+    // Thresholds:
+    //   >= 55 pts → "Likely Advised"    — Lead with plan review, not discovery
+    //   >= 30 pts → "Possibly Advised"  — Probe for gaps in current planning  
+    //   <  30 pts → "Likely Unadvised"  — Education-first, greenfield prospect
+    //
+    // TODO: Validate with Jeff/DataAxel — are there direct fields for
+    //       advisor relationship, RIA affiliation, or brokerage account?
+    // ═══════════════════════════════════════════════════════════════
     function advisorLikelihood(p) {
         // Derive probability of having an existing advisor from demographic signals
         let score = 0;
@@ -506,6 +527,17 @@ const eveningUnmatched = [
         if (score >= 30) return { level: 'Moderate', label: 'Possibly Advised', color: 'var(--accent-blue)', tip: 'May have basic advisor relationship. Probe for gaps in current planning.' };
         return { level: 'Low', label: 'Likely Unadvised', color: 'var(--accent-neon)', tip: 'Strong greenfield prospect. Education-first approach recommended.' };
     }
+    // ═══════════════════════════════════════════════════════════════
+    // PROSPECT SCORE — Composite quality score (0-99) for ranking.
+    //
+    // Weights (configurable):
+    //   Net worth:     35%   (wealthTier 1-4, scaled to 0-100)
+    //   Income:        25%   (incomeTier 1-4, scaled to 0-100)
+    //   Investor type: 25%   (investorTier 1-4, scaled to 0-100)
+    //   Home value:    15%   (derived from homeValue string, 0-95)
+    //
+    // Final score boosted 15% to push qualified prospects into 80+ range.
+    // ═══════════════════════════════════════════════════════════════
     function calculateScore(p) {
         const t = weights.worth + weights.income + weights.investor + weights.home;
         if (!t) return 0;
